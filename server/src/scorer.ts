@@ -18,6 +18,8 @@ export default class ScoreResolver{
             else {
                 this.rateTbl = d.collection("ratings");
                 this.uniTbl = d.collection("university");
+                log.info("Connected to mongodb");
+
             }
         });
     }
@@ -34,26 +36,32 @@ export default class ScoreResolver{
         })   
     }
 
-    rmpGet(name:String, scraper: any, University:String):Promise<returnedQuery>{
+    rmpGet(name:String, scraper: any, university:String):Promise<returnedQuery>{
         // This way the database won't have duplicates due to capitalization
         name = name.toLowerCase();
 
         return new Promise((resolve, reject) => {
-            this.rateTbl.findOne({University, name})
+            this.rateTbl.findOne({university, name})
             .then(r => {
                 if(r != null){
                     resolve({
                         queryName: name,
                         data: r
                     });
-                }
+                    console.log("fulfilled!!");
+                    return {fulfilled: true};
+                } else return {fulfilled: false};
             }, e => {
                 this.log.error(e);
             })
             .then(v => {
+                if(v.fulfilled == true)
+                    return;
+                
+                console.log(v);
                 scraper.get(name, (p:Professor|null) => {
                     if(p !== null){
-                        this.rateTbl.insertOne(p);
+                        this.rateTbl.insertOne(Object.assign({}, p, {name}));
                     }
                     resolve({
                         queryName: name,

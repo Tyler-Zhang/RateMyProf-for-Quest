@@ -11,6 +11,7 @@ class ScoreResolver {
             else {
                 this.rateTbl = d.collection("ratings");
                 this.uniTbl = d.collection("university");
+                log.info("Connected to mongodb");
             }
         });
     }
@@ -23,25 +24,32 @@ class ScoreResolver {
             return Promise.all(names.map(v => this.rmpGet(v, scraper, university)));
         });
     }
-    rmpGet(name, scraper, University) {
+    rmpGet(name, scraper, university) {
         // This way the database won't have duplicates due to capitalization
         name = name.toLowerCase();
         return new Promise((resolve, reject) => {
-            this.rateTbl.findOne({ University, name })
+            this.rateTbl.findOne({ university, name })
                 .then(r => {
                 if (r != null) {
                     resolve({
                         queryName: name,
                         data: r
                     });
+                    console.log("fulfilled!!");
+                    return { fulfilled: true };
                 }
+                else
+                    return { fulfilled: false };
             }, e => {
                 this.log.error(e);
             })
                 .then(v => {
+                if (v.fulfilled == true)
+                    return;
+                console.log(v);
                 scraper.get(name, (p) => {
                     if (p !== null) {
-                        this.rateTbl.insertOne(p);
+                        this.rateTbl.insertOne(Object.assign({}, p, { name }));
                     }
                     resolve({
                         queryName: name,
