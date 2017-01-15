@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+
+  "name": "Rate my Professor",
+  "description": "This extension inject professor reviews into university websites",
+  "version": "0.1",
+  "content_scripts": [
+      {
+          "matches": ["*://quest.pecs.uwaterloo.ca/*"],
+          "js": [ "jquery-3.1.1.min.js", "content.js"],
+          "run_at": "document_end"
+      }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "Change Settings"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "https://ajax.googleapis.com/"
+  ]
+}
