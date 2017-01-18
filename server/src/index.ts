@@ -5,9 +5,11 @@ import * as express from "express";
 import * as path from "path";
 import * as bodyParser from "body-parser";
 import * as bunyan from "bunyan";
+import * as fs from "fs";
 import ScoreResolver from "./scorer";
 
 const compression = require("compression");
+const config = require("./config.js");
 const log = bunyan.createLogger({
     name: "RMP-quest",
     streams: [
@@ -58,7 +60,11 @@ app.get("*", (req, res) => {
 });
 
 
-http.createServer(app).listen(80, () => {
-    log.info("The server has been opened on port 80");
-})
+ const options = {
+        key: fs.readFileSync(config.httpsKeyPath),
+        cert: fs.readFileSync(config.httpsCertPath)
+    }
 
+https.createServer(options, app).listen(8080, ()=>{
+    log.info("The HTTPS server has been opened on port 443");
+});

@@ -1,10 +1,12 @@
 "use strict";
-const http = require("http");
+const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 const bunyan = require("bunyan");
+const fs = require("fs");
 const scorer_1 = require("./scorer");
 const compression = require("compression");
+const config = require("../config.js");
 const log = bunyan.createLogger({
     name: "RMP-quest",
     streams: [
@@ -44,7 +46,11 @@ app.post("*", (req, res) => {
 app.get("*", (req, res) => {
     res.status(400).end("this is not a valid route");
 });
-http.createServer(app).listen(80, () => {
-    log.info("The server has been opened on port 80");
+const options = {
+    key: fs.readFileSync(config.httpsKeyPath),
+    cert: fs.readFileSync(config.httpsCertPath)
+};
+https.createServer(options, app).listen(8080, () => {
+    log.info("The HTTPS server has been opened on port 443");
 });
 //# sourceMappingURL=index.js.map
