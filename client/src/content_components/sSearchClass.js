@@ -1,5 +1,5 @@
 import {getReviews} from "api";
-export default function search(){
+export default function s_SearchClass(){
 
     // Get all teacher names on the page
     let teachers = $("span[id^='MTG_INSTR']");

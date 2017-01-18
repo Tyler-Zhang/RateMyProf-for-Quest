@@ -52,7 +52,39 @@
 
 	var _sSearchClass = __webpack_require__(2);
 
+	var _sSearchClass2 = _interopRequireDefault(_sSearchClass);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var searchPipeline = function () {
+	    function searchPipeline() {
+	        _classCallCheck(this, searchPipeline);
+
+	        this.steps = [];
+	    }
+
+	    _createClass(searchPipeline, [{
+	        key: "use",
+	        value: function use(func) {
+	            this.steps.push(func);
+	            console.log(func);
+	        }
+	    }, {
+	        key: "search",
+	        value: function search() {
+	            for (var x = 0; x < this.steps.length; x++) {
+	                console.log("searching");
+	                var result = this.steps[x].apply(this);
+	                if (result === true) return;
+	            }
+	            setTimeout(this.search.bind(this), 2000);
+	        }
+	    }]);
+
+	    return searchPipeline;
+	}();
 
 	var iframeID = "ptifrmtgtframe";
 	var iframe = document.getElementById(iframeID);
@@ -66,38 +98,11 @@
 	    beginSearch();
 	}
 
-	var searchPipeline = function () {
-	    function searchPipeline() {
-	        _classCallCheck(this, searchPipeline);
-
-	        this.steps = [];
-	    }
-
-	    _createClass(searchPipeline, [{
-	        key: "use",
-	        value: function use(func) {
-	            this.steps.push(func);
-	        }
-	    }, {
-	        key: "search",
-	        value: function search() {
-	            for (var x = 0; x < this.steps.length; x++) {
-	                console.log("searching");
-	                var result = this.steps[x].apply(this);
-	                if (result === true) return;
-	            }
-
-	            setTimeout(this.search, 2000);
-	        }
-	    }]);
-
-	    return searchPipeline;
-	}();
-
 	function beginSearch() {
 	    console.log("Setting up pipeline");
+	    console.log(_sSearchClass2.default);
 	    var sPipeline = new searchPipeline();
-	    sPipeline.use(_sSearchClass.search);
+	    sPipeline.use(_sSearchClass2.default);
 
 	    sPipeline.search();
 	}
@@ -117,7 +122,7 @@
 
 	    var jsonBody = JSON.stringify(body);
 
-	    return fetch("http://localhost/" + api, {
+	    return fetch("https://localhost/" + api, {
 	        method: "POST",
 	        body: jsonBody,
 	        headers: {
@@ -154,11 +159,11 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.default = search;
+	exports.default = s_SearchClass;
 
 	var _api = __webpack_require__(1);
 
-	function search() {
+	function s_SearchClass() {
 
 	    // Get all teacher names on the page
 	    var teachers = $("span[id^='MTG_INSTR']");

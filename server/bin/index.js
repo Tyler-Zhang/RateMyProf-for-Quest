@@ -21,20 +21,20 @@ app.post("/getReviews", (req, res) => {
     let school = req.body.school;
     let names = req.body.names;
     if (school == null || school == "") {
-        res.status(300).json({ success: false, message: "Missing school field" });
+        res.status(300).json({ success: false, body: "Missing school field" });
         log.info("The request was missing the school name");
         return;
     }
     if (names == null || !Array.isArray(names) || names.length == 0) {
-        res.status(300).json({ success: false, message: "Missing field names" });
+        res.status(300).json({ success: false, body: "Missing field names" });
         log.info("The request was missing teacher names");
         return;
     }
     Scorer.getScore(school, names).then(d => {
         if (d == null)
-            res.status(300).json({ success: false, message: "School name is invalid" });
+            res.status(300).json({ success: false, body: "School name is invalid" });
         else
-            res.json(d);
+            res.json({ success: true, body: d });
         console.log(d);
     });
 });

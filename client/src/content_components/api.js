@@ -2,7 +2,7 @@ function base(api, body){
 
     let jsonBody = JSON.stringify(body);
 
-    return fetch("http://localhost/" + api, {
+    return fetch("https://localhost/" + api, {
         method: "POST",
         body: jsonBody,
         headers: {
