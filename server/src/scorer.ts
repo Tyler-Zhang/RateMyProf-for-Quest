@@ -48,7 +48,6 @@ export default class ScoreResolver{
                         queryName: name,
                         data: r
                     });
-                    console.log("fulfilled!!");
                     return {fulfilled: true};
                 } else return {fulfilled: false};
             }, e => {
@@ -58,8 +57,7 @@ export default class ScoreResolver{
             .then(v => {
                 if(v.fulfilled == true)
                     return;
-                
-                console.log(v);
+
                 scraper.get(name, (p:Professor|null) => {
                     if(p !== null){
                         this.rateTbl.update({university, name}, Object.assign({}, p, {name}), {upsert: true});

@@ -36,21 +36,20 @@ class ScoreResolver {
                         queryName: name,
                         data: r
                     });
-                    console.log("fulfilled!!");
                     return { fulfilled: true };
                 }
                 else
                     return { fulfilled: false };
             }, e => {
                 this.log.error(e);
+                return { fullfilled: false };
             })
                 .then(v => {
                 if (v.fulfilled == true)
                     return;
-                console.log(v);
                 scraper.get(name, (p) => {
                     if (p !== null) {
-                        this.rateTbl.insertOne(Object.assign({}, p, { name }));
+                        this.rateTbl.update({ university, name }, Object.assign({}, p, { name }), { upsert: true });
                     }
                     resolve({
                         queryName: name,

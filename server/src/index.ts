@@ -51,7 +51,6 @@ app.post("/getReviews", (req, res) => {
             res.status(300).json({success:false, body: "School name is invalid"});
         
         else res.json({success: true, body: d});
-        console.log(d);
     });
     
 });
