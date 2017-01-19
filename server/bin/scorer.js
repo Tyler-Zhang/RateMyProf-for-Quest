@@ -11,17 +11,9 @@ class ScoreResolver {
             if (err)
                 log.error(err);
             else {
-                log.info("Connected to mongodb");
-                 d.authenticate(config.dbAuth.username, config.dbAuth.password, (e, r) => {
-                    if(e){
-                        log.error("Database authentication failed");
-                        throw e;
-                    }
-                    this.rateTbl = d.collection("ratings");
-                    this.uniTbl = d.collection("university");
-                    log.info("Authenticated to mongodb");
-                });
-                
+                this.rateTbl = d.collection("ratings");
+                this.uniTbl = d.collection("university");
+                log.info("Authenticated to mongodb");
             }
         });
     }
