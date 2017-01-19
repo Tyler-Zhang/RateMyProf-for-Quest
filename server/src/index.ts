@@ -9,7 +9,7 @@ import * as fs from "fs";
 import ScoreResolver from "./scorer";
 
 const compression = require("compression");
-const config = require("./config.js");
+const config = require("../config.js");
 const log = bunyan.createLogger({
     name: "RMP-quest",
     streams: [

@@ -1,7 +1,7 @@
 "use strict";
 const mongodb = require("mongodb");
 const rmp = require('rmp-api');
-const config = require("../config");
+const config = require("../config.js");
 let mongoCli = mongodb.MongoClient;
 class ScoreResolver {
     constructor(log) {

@@ -1,7 +1,7 @@
 import * as mongodb from "mongodb";
 import * as bunyan from "bunyan";
 const rmp = require('rmp-api');
-const config = require("../config");
+const config = require("../config.js");
 let mongoCli = mongodb.MongoClient;
 
 export default class ScoreResolver{
