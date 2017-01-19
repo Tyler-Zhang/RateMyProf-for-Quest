@@ -122,7 +122,7 @@
 
 	    var jsonBody = JSON.stringify(body);
 
-	    return fetch("https://localhost/" + api, {
+	    return fetch("https://tylerzhang.com:8080" + api, {
 	        method: "POST",
 	        body: jsonBody,
 	        headers: {
