@@ -1,6 +1,8 @@
 import {getReviews} from "api";
 import s_SearchClass from "sSearchClass";
 
+const refresh = 1000;
+
 class searchPipeline{
     constructor(){
         this.steps = [];
@@ -16,7 +18,7 @@ class searchPipeline{
             if(result === true)
                 return;
         }
-        setTimeout(this.search.bind(this), 2000);
+        setTimeout(this.search.bind(this), refresh);
     }
 }
 

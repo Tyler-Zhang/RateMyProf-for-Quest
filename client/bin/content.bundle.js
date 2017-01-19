@@ -58,6 +58,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var refresh = 1000;
+
 	var searchPipeline = function () {
 	    function searchPipeline() {
 	        _classCallCheck(this, searchPipeline);
@@ -77,7 +79,7 @@
 	                var result = this.steps[x].apply(this);
 	                if (result === true) return;
 	            }
-	            setTimeout(this.search.bind(this), 2000);
+	            setTimeout(this.search.bind(this), refresh);
 	        }
 	    }]);
 
@@ -162,47 +164,82 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 	exports.default = s_SearchClass;
 
 	var _api = __webpack_require__(1);
 
+	var displayed_Headings = [{ name: "Quality", desc: "How generally awesome the professor is", key: "quality" }, { name: "Easiness", desc: "How easy the professor is ", key: "easiness" }, { name: "Clarity", desc: "How clear the professor's lectures are", key: "clarity" }];
+
 	function s_SearchClass() {
 
 	    // Get all teacher names on the page
-	    var teachers = $("span[id^='MTG_INSTR']").toArray();
+	    var teachers = $("span[id^='MTG_INSTR']");
+	    // If there are atleast one teacher not named staff
+	    if (teachers == null || teachers.length <= 0) {
+	        return false; // Teachers weren't found using this method, move onto the next method
+	    }
+
+	    var insHeading = $("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
+	    var headingTemplate = insHeading.first(); // Get a heading template
+
+	    /** Generates the headings for each class depending on the displayed_Headings array */
+
+	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
+	        var currScore = $("<td>").attr({ "rmpquest": b.key, style: "background-color:white" }).html("N/A");
+
+	        var currHeading = headingTemplate.clone();
+	        currHeading.children().attr({ id: "", href: "javascript: void(0)", title: b.desc }).html(b.name);
+
+	        return [a[0].concat(currHeading), a[1].concat(currScore)];
+	    }, [[], []]),
+	        _displayed_Headings$r2 = _slicedToArray(_displayed_Headings$r, 2),
+	        headings = _displayed_Headings$r2[0],
+	        score = _displayed_Headings$r2[1];
+
+	    // Inserts the headings after the "instructors" heading
+
+
+	    insHeading.after(headings);
+	    var $score = $(score);
+
+	    teachers.each(function (i, e) {
+	        console.log(e.value);
+	        var ele = $score.clone(); //.attr("name", e.value);
+	        //console.log(ele);
+	        $(e).closest("td").after(ele);
+	    });
+
 	    // Extract all the actual teachers
 	    var teacherNames = teachers.map(function (v) {
 	        return v.innerHTML;
 	    }).filter(function (v) {
 	        return v.toLowerCase() != "staff";
 	    });
-	    console.log(teacherNames);
-	    // If there are atleast one teacher not named staff
-	    if (teachers != null && teachers.length > 0) {
-	        (0, _api.getReviews)(teacherNames).then(function (d) {
-	            teachers.forEach(function (v) {
-	                console.table(d);
-	                var name = v.innerHTML; // Get the name of the prof
-	                var data = d.find(function (obj) {
-	                    return obj.queryName.toLowerCase() === name.toLowerCase();
-	                });
-	                console.log(name);
-	                console.log(data);
-	                if (data == null || data.data == null) {
-	                    /**
-	                     * The teacher doesn't have any data
-	                     * Do something?
-	                     * @todo implement suggestions
-	                     */
-	                    return;
-	                } else {
-	                    v.innerHTML += "<b> " + data.data.quality + " </b>";
-	                }
+
+	    (0, _api.getReviews)(teacherNames).then(function (d) {
+	        teachers.forEach(function (v) {
+	            //console.table(d);
+	            var name = v.innerHTML; // Get the name of the prof
+	            var data = d.find(function (obj) {
+	                return obj.queryName.toLowerCase() === name.toLowerCase();
 	            });
+	            if (data == null || data.data == null) {
+	                /**
+	                 * The teacher doesn't have any data
+	                 * Do something?
+	                 * @todo implement suggestions
+	                 */
+	                return;
+	            } else {
+	                v.innerHTML += "<b> " + data.data.quality + " </b>";
+	            }
 	        });
-	        // This module can resolve the teachers on this page, so return true;
-	        return true;
-	    } else return false;
+	    });
+	    // This module can resolve the teachers on this page, so return true;
+	    return true;
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
