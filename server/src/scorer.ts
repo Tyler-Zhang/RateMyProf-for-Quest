@@ -40,7 +40,7 @@ export default class ScoreResolver{
         // This way the database won't have duplicates due to capitalization
         name = name.toLowerCase();
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => { 
             this.rateTbl.findOne({university, name})
             .then(r => {
                 if(r != null){
@@ -53,6 +53,7 @@ export default class ScoreResolver{
                 } else return {fulfilled: false};
             }, e => {
                 this.log.error(e);
+                return {fullfilled: false};
             })
             .then(v => {
                 if(v.fulfilled == true)
@@ -61,7 +62,7 @@ export default class ScoreResolver{
                 console.log(v);
                 scraper.get(name, (p:Professor|null) => {
                     if(p !== null){
-                        this.rateTbl.insertOne(Object.assign({}, p, {name}));
+                        this.rateTbl.update({university, name}, Object.assign({}, p, {name}), {upsert: true});
                     }
                     resolve({
                         queryName: name,
