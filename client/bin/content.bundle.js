@@ -69,13 +69,11 @@
 	        key: "use",
 	        value: function use(func) {
 	            this.steps.push(func);
-	            console.log(func);
 	        }
 	    }, {
 	        key: "search",
 	        value: function search() {
 	            for (var x = 0; x < this.steps.length; x++) {
-	                console.log("searching");
 	                var result = this.steps[x].apply(this);
 	                if (result === true) return;
 	            }
@@ -93,14 +91,11 @@
 	if (iframe != null) {
 	    var src = iframe.src;
 	    window.location = src;
-	    console.log(src);
 	} else {
 	    beginSearch();
 	}
 
 	function beginSearch() {
-	    console.log("Setting up pipeline");
-	    console.log(_sSearchClass2.default);
 	    var sPipeline = new searchPipeline();
 	    sPipeline.use(_sSearchClass2.default);
 
@@ -120,7 +115,10 @@
 	exports.suggestReview = suggestReview;
 	function base(api, body) {
 
-	    var jsonBody = JSON.stringify(body);
+	    var obj = Object.assign({}, body, { school: "University of Waterloo" });
+
+	    var jsonBody = JSON.stringify(obj);
+	    //console.log(jsonBody);
 
 	    return fetch("https://tylerzhang.com:8080" + api, {
 	        method: "POST",
@@ -129,6 +127,10 @@
 	            "Content-Type": "application/json; charset=utf-8"
 	        }
 	    }, function (e) {
+	        return { success: false, body: e };
+	    }).then(function (d) {
+	        return d.json();
+	    }).catch(function (e) {
 	        return { success: false, body: e };
 	    }).then(function (d) {
 	        if (d.success === true) {
@@ -142,7 +144,8 @@
 	 * @param {String[]} names The names of the professors
 	 */
 	function getReviews(names) {
-	    return base("/getReviews", names);
+	    console.log(names);
+	    return base("/getReviews", { names: names });
 	}
 	/**
 	 * @param {String} name the name of the professors
@@ -166,22 +169,25 @@
 	function s_SearchClass() {
 
 	    // Get all teacher names on the page
-	    var teachers = $("span[id^='MTG_INSTR']");
+	    var teachers = $("span[id^='MTG_INSTR']").toArray();
 	    // Extract all the actual teachers
 	    var teacherNames = teachers.map(function (v) {
 	        return v.innerHTML;
 	    }).filter(function (v) {
-	        return v.lowerCase() != "staff";
+	        return v.toLowerCase() != "staff";
 	    });
-
+	    console.log(teacherNames);
 	    // If there are atleast one teacher not named staff
 	    if (teachers != null && teachers.length > 0) {
 	        (0, _api.getReviews)(teacherNames).then(function (d) {
 	            teachers.forEach(function (v) {
+	                console.table(d);
 	                var name = v.innerHTML; // Get the name of the prof
 	                var data = d.find(function (obj) {
-	                    return obj.queryName.toLowerCase() === name.toLowerCase;
+	                    return obj.queryName.toLowerCase() === name.toLowerCase();
 	                });
+	                console.log(name);
+	                console.log(data);
 	                if (data == null || data.data == null) {
 	                    /**
 	                     * The teacher doesn't have any data
@@ -190,11 +196,10 @@
 	                     */
 	                    return;
 	                } else {
-	                    v.innerHTML += data.data.quality;
+	                    v.innerHTML += "<b> " + data.data.quality + " </b>";
 	                }
 	            });
 	        });
-
 	        // This module can resolve the teachers on this page, so return true;
 	        return true;
 	    } else return false;

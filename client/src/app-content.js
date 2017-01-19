@@ -8,12 +8,10 @@ class searchPipeline{
     
     use(func){
         this.steps.push(func);
-        console.log(func);
     }
 
     search(){
         for(let x = 0; x < this.steps.length; x ++){
-            console.log("searching");
             let result = this.steps[x].apply(this);
             if(result === true)
                 return;
@@ -30,14 +28,11 @@ let iframe = document.getElementById(iframeID);
 if(iframe != null){
     const src = iframe.src;
     window.location = src;
-    console.log(src);
 } else {
     beginSearch();
 }
 
 function beginSearch(){
-    console.log("Setting up pipeline");
-    console.log(s_SearchClass);
     let sPipeline = new searchPipeline();
     sPipeline.use(s_SearchClass);
 

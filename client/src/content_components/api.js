@@ -1,6 +1,9 @@
 function base(api, body){
 
-    let jsonBody = JSON.stringify(body);
+    let obj = Object.assign({}, body, {school: "University of Waterloo"});
+
+    let jsonBody = JSON.stringify(obj);
+    //console.log(jsonBody);
 
     return fetch("https://tylerzhang.com:8080" + api, {
         method: "POST",
@@ -8,7 +11,14 @@ function base(api, body){
         headers: {
             "Content-Type": "application/json; charset=utf-8"
         }
-    }, e => {return {success: false, body: e}}).then(d => {
+    }, e => {return {success: false, body: e}})
+    .then(d => {
+        return d.json();
+    })
+    .catch( e => {
+        return {success:false, body: e};
+    })
+    .then(d => {
         if(d.success === true){
             return d.body;
         } else {
@@ -20,7 +30,8 @@ function base(api, body){
  * @param {String[]} names The names of the professors
  */
 export function getReviews(names){
-    return base("/getReviews", names);
+    console.log(names);
+    return base("/getReviews", {names});
 }
 /**
  * @param {String} name the name of the professors
