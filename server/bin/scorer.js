@@ -2,7 +2,6 @@
 const mongodb = require("mongodb");
 const rmp = require('rmp-api');
 const config = require("../config.js");
-
 let mongoCli = mongodb.MongoClient;
 class ScoreResolver {
     constructor(log) {
@@ -13,7 +12,7 @@ class ScoreResolver {
             else {
                 this.rateTbl = d.collection("ratings");
                 this.uniTbl = d.collection("university");
-                log.info("Authenticated to mongodb");
+                log.info("Connected to mongodb");
             }
         });
     }

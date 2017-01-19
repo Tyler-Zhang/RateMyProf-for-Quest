@@ -1,6 +1,7 @@
 import * as mongodb from "mongodb";
 import * as bunyan from "bunyan";
 const rmp = require('rmp-api');
+const config = require("../config.js");
 let mongoCli = mongodb.MongoClient;
 
 export default class ScoreResolver{
@@ -12,14 +13,13 @@ export default class ScoreResolver{
     constructor(log:bunyan){
         this.log = log;
 
-        mongoCli.connect("mongodb://localhost:27017/RMPforQuest", (err, d) => {
+        mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
             if(err)
                 log.error(err);
             else {
                 this.rateTbl = d.collection("ratings");
                 this.uniTbl = d.collection("university");
                 log.info("Connected to mongodb");
-
             }
         });
     }

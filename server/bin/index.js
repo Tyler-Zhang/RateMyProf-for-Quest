@@ -6,7 +6,7 @@ const bunyan = require("bunyan");
 const fs = require("fs");
 const scorer_1 = require("./scorer");
 const compression = require("compression");
-const config = require("../config.js");
+const config = require("./config.js");
 const log = bunyan.createLogger({
     name: "RMP-quest",
     streams: [
