@@ -171,7 +171,26 @@
 
 	var _api = __webpack_require__(1);
 
-	var displayed_Headings = [{ name: "Quality", desc: "How generally awesome the professor is", key: "quality" }, { name: "Easiness", desc: "How easy the professor is ", key: "easiness" }, { name: "Clarity", desc: "How clear the professor's lectures are", key: "clarity" }];
+	var displayed_Headings = [{
+	    name: "Quality",
+	    desc: "How generally awesome the professor is",
+	    key: "quality",
+	    colored: true,
+	    colored_inverted: false,
+	    offset: 0
+	}, {
+	    name: "Difficulty",
+	    desc: "How easy the professor is ",
+	    key: "easiness",
+	    colored: true,
+	    colored_inverted: true,
+	    offset: 1 }];
+
+	var colors = ["darkRed", "red", "orange", "yellow", "lightGreen", "green"];
+	var maxScore = 5;
+	var cellStyle = {
+	    height: "50px"
+	};
 
 	function s_SearchClass() {
 
@@ -182,15 +201,18 @@
 	        return false; // Teachers weren't found using this method, move onto the next method
 	    }
 
+	    $("table[id^='SSR_CLSRCH_MTG']").attr("width", "600");
+
 	    var insHeading = $("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
 	    var headingTemplate = insHeading.first(); // Get a heading template
 
 	    /** Generates the headings for each class depending on the displayed_Headings array */
 
 	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
-	        var currScore = $("<td>").attr({ "rmpquest": b.key, style: "background-color:white" }).html("N/A");
+	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white" }).html("N/A");
 
 	        var currHeading = headingTemplate.clone();
+	        currHeading.attr("width", 60);
 	        currHeading.children().attr({ id: "", href: "javascript: void(0)", title: b.desc }).html(b.name);
 
 	        return [a[0].concat(currHeading), a[1].concat(currScore)];
@@ -203,39 +225,53 @@
 
 
 	    insHeading.after(headings);
-	    var $score = $(score);
 
 	    teachers.each(function (i, e) {
-	        console.log(e.value);
-	        var ele = $score.clone(); //.attr("name", e.value);
-	        //console.log(ele);
+	        /** Hack because of know jquery bug */
+	        var ele = score.map(function (v) {
+	            return $(v).clone();
+	        });
 	        $(e).closest("td").after(ele);
+	        $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
 	    });
 
 	    // Extract all the actual teachers
-	    var teacherNames = teachers.map(function (v) {
+	    var teacherNames = teachers.toArray().map(function (v) {
 	        return v.innerHTML;
 	    }).filter(function (v) {
 	        return v.toLowerCase() != "staff";
 	    });
 
 	    (0, _api.getReviews)(teacherNames).then(function (d) {
-	        teachers.forEach(function (v) {
-	            //console.table(d);
-	            var name = v.innerHTML; // Get the name of the prof
-	            var data = d.find(function (obj) {
-	                return obj.queryName.toLowerCase() === name.toLowerCase();
-	            });
-	            if (data == null || data.data == null) {
-	                /**
-	                 * The teacher doesn't have any data
-	                 * Do something?
-	                 * @todo implement suggestions
-	                 */
+	        d.forEach(function (v) {
+	            var name = v.queryName;
+	            var data = v.data;
+	            if (data == null) // Nothing was found o
 	                return;
-	            } else {
-	                v.innerHTML += "<b> " + data.data.quality + " </b>";
-	            }
+	            /**
+	             * @todo put in a link to suggest a rmp link
+	             */
+
+	            // Get the row with the professor's information
+	            var profRow = $("tr[rmpquest-name='" + name + "']");
+	            console.log(data);
+	            displayed_Headings.forEach(function (h) {
+	                var val = data[h.key];
+	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
+
+	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
+
+	                /**If we want to color the cell */
+	                if (h.colored) {
+	                    var idx = void 0;
+	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
+
+	                    if (workingVal <= 1.5) idx = 0;else if (workingVal <= 2) idx = 1;else if (workingVal <= 3) idx = 2;else if (workingVal <= 3.5) idx = 3;else if (workingVal <= 4.2) idx = 4;else idx = 5;
+
+	                    var color = colors[idx];
+	                    cell.css("background-color", color);
+	                }
+	            });
 	        });
 	    });
 	    // This module can resolve the teachers on this page, so return true;
