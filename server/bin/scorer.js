@@ -10,6 +10,7 @@ class ScoreResolver {
             quality: 1,
             easiness: 1,
             chilli: 1,
+            topTag: 1,
             _id: 0
         };
         this.log = log;
@@ -43,16 +44,16 @@ class ScoreResolver {
                         queryName: name,
                         data: r
                     });
-                    return { fulfilled: true };
+                    return true;
                 }
                 else
-                    return { fulfilled: false };
+                    return false;
             }, e => {
                 this.log.error(e);
-                return { fullfilled: false };
+                return false;
             })
                 .then(v => {
-                if (v.fulfilled == true)
+                if (v === true)
                     return;
                 scraper.get(name, (p) => {
                     if (p !== null) {
@@ -61,11 +62,12 @@ class ScoreResolver {
                             name,
                             fname: p.fname.toLowerCase(),
                             lname: p.lname.toLowerCase(),
-                            count: p.comments.length,
-                            help: undefined,
-                            clarity: undefined,
-                            grade: undefined
+                            count: p.comments.length
                         });
+                        /** Delete these useless fields, they're always the same as easiness*/
+                        delete formattedObj.help;
+                        delete formattedObj.clarity;
+                        delete formattedObj.grade;
                         this.rateTbl.update({ university, name }, formattedObj, { upsert: true });
                         resolve({
                             queryName: name,
@@ -73,7 +75,8 @@ class ScoreResolver {
                                 count: formattedObj.count,
                                 quality: formattedObj.quality,
                                 easiness: formattedObj.easiness,
-                                chilli: formattedObj.chili
+                                chilli: formattedObj.chili,
+                                topTag: formattedObj.topTag
                             }
                         });
                     }
