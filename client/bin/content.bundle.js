@@ -193,7 +193,20 @@
 	    key: "easiness",
 	    colored: true,
 	    colored_inverted: true,
-	    offset: 1 }];
+	    offset: 1.5 }, {
+	    name: "Reviews",
+	    desc: "How many people have reviewed the professor",
+	    colored: false,
+	    key: "count"
+	}
+
+	/*{
+	    name: "Clarity",
+	    desc: "How clear the professor's lectures are",
+	    key: "clarity",
+	    colored: true,
+	    colored_inverted: false}*/
+	];
 
 	var colors = ["darkRed", "red", "orange", "yellow", "lightGreen", "green"];
 	var maxScore = 5;
@@ -210,7 +223,7 @@
 	        return false; // Teachers weren't found using this method, move onto the next method
 	    }
 
-	    $("table[id^='SSR_CLSRCH_MTG']").attr("width", "600");
+	    $("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
 
 	    var insHeading = $("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
 	    var headingTemplate = insHeading.first(); // Get a heading template
