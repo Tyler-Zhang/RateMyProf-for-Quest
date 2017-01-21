@@ -207,17 +207,24 @@
 	};
 
 	function s_SearchClass() {
-
+	    var mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
 	    // Get all teacher names on the page
-	    var teachers = $("span[id^='MTG_INSTR']");
+	    var teachers = mainTable.find("span[id^='MTG_INSTR']");
 	    // If there are atleast one teacher not named staff
 	    if (teachers == null || teachers.length <= 0) {
 	        return false; // Teachers weren't found using this method, move onto the next method
 	    }
+	    var that = this;
+	    setTimeout(function () {
+	        return renderPage.call(that, mainTable, teachers);
+	    }, 0);
+	    return true;
+	}
 
-	    $("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
+	function renderPage(mainTable, teachers) {
 
-	    var insHeading = $("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
+	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
+	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
 	    var headingTemplate = insHeading.first(); // Get a heading template
 
 	    /** Generates the headings for each class depending on the displayed_Headings array */
@@ -267,7 +274,7 @@
 	             */
 
 	            // Get the row with the professor's information
-	            var profRow = $("tr[rmpquest-name='" + name + "']");
+	            var profRow = mainTable.find("tr[rmpquest-name='" + name + "']");
 	            console.log(data);
 	            displayed_Headings.forEach(function (h) {
 	                var val = data[h.key];
@@ -284,8 +291,6 @@
 	            });
 	        });
 	    });
-	    // This module can resolve the teachers on this page, so return true;
-	    return true;
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 

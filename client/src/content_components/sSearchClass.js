@@ -38,17 +38,22 @@ const cellStyle = {
 }
 
 export default function s_SearchClass(){
-    
+    let mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
     // Get all teacher names on the page
-    let teachers = $("span[id^='MTG_INSTR']");
+    let teachers = mainTable.find("span[id^='MTG_INSTR']");
     // If there are atleast one teacher not named staff
     if(teachers == null || teachers.length <= 0){
         return false; // Teachers weren't found using this method, move onto the next method
     }
+    let that = this;
+    setTimeout(() => renderPage.call(that, mainTable, teachers), 0);
+    return true;
+}
 
-    $("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
-
-    let insHeading = $("th[abbr='Instructor']");    // Find all heading called "instructor" so we can append more headings after them
+function renderPage(mainTable, teachers){
+    
+    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
+    let insHeading = mainTable.find("th[abbr='Instructor']");    // Find all heading called "instructor" so we can append more headings after them
     let headingTemplate = insHeading.first();       // Get a heading template
 
     /** Generates the headings for each class depending on the displayed_Headings array */
@@ -86,7 +91,7 @@ export default function s_SearchClass(){
              */
 
             // Get the row with the professor's information
-            let profRow = $(`tr[rmpquest-name='${name}']`);
+            let profRow = mainTable.find(`tr[rmpquest-name='${name}']`);
             console.log(data);
             displayed_Headings.forEach(h => {
                 let val = data[h.key];
@@ -103,6 +108,4 @@ export default function s_SearchClass(){
             })            
         })
     });
-    // This module can resolve the teachers on this page, so return true;
-    return true;
 }
