@@ -115,6 +115,9 @@
 	});
 	exports.getReviews = getReviews;
 	exports.suggestReview = suggestReview;
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 	function base(api, body) {
 
 	    var obj = Object.assign({}, body, { school: "University of Waterloo" });
@@ -154,6 +157,12 @@
 	 * @param {String} url the url of the rate my prof page
 	 */
 	function suggestReview(name, url) {}
+
+	var timeConflictChecker = exports.timeConflictChecker = function timeConflictChecker() {
+	    _classCallCheck(this, timeConflictChecker);
+
+	    this.raw = [];
+	};
 
 /***/ },
 /* 2 */
@@ -266,7 +275,7 @@
 	                    var idx = void 0;
 	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
 
-	                    if (workingVal <= 1.5) idx = 0;else if (workingVal <= 2) idx = 1;else if (workingVal <= 3) idx = 2;else if (workingVal <= 3.5) idx = 3;else if (workingVal <= 4.2) idx = 4;else idx = 5;
+	                    if (workingVal <= 1.5) idx = 0;else if (workingVal <= 2) idx = 1;else if (workingVal <= 3) idx = 2;else if (workingVal <= 3.8) idx = 3;else if (workingVal <= 4.4) idx = 4;else idx = 5;
 
 	                    var color = colors[idx];
 	                    cell.css("background-color", color);

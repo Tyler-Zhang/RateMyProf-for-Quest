@@ -107,9 +107,9 @@ export default function s_SearchClass(){
                         idx = 1;
                     else if(workingVal <= 3)
                         idx = 2;
-                    else if(workingVal <= 3.5)
+                    else if(workingVal <= 3.8)
                         idx = 3;
-                    else if(workingVal <= 4.2)
+                    else if(workingVal <= 4.4)
                         idx = 4;
                     else
                         idx = 5;

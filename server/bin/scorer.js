@@ -5,6 +5,13 @@ const config = require("../config.js");
 let mongoCli = mongodb.MongoClient;
 class ScoreResolver {
     constructor(log) {
+        this.projection = {
+            count: 1,
+            quality: 1,
+            easiness: 1,
+            chilli: 1,
+            _id: 0
+        };
         this.log = log;
         mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
             if (err)
@@ -29,7 +36,7 @@ class ScoreResolver {
         // This way the database won't have duplicates due to capitalization
         name = name.toLowerCase();
         return new Promise((resolve, reject) => {
-            this.rateTbl.findOne({ university, name })
+            this.rateTbl.findOne({ university, name }, this.projection)
                 .then(r => {
                 if (r != null) {
                     resolve({
@@ -49,12 +56,33 @@ class ScoreResolver {
                     return;
                 scraper.get(name, (p) => {
                     if (p !== null) {
-                        this.rateTbl.update({ university, name }, Object.assign({}, p, { name }), { upsert: true });
+                        /** Make the names lowercase, counts the amount of ratings */
+                        let formattedObj = Object.assign({}, p, {
+                            name,
+                            fname: p.fname.toLowerCase(),
+                            lname: p.lname.toLowerCase(),
+                            count: p.comments.length,
+                            help: undefined,
+                            clarity: undefined,
+                            grade: undefined
+                        });
+                        this.rateTbl.update({ university, name }, formattedObj, { upsert: true });
+                        resolve({
+                            queryName: name,
+                            data: {
+                                count: formattedObj.count,
+                                quality: formattedObj.quality,
+                                easiness: formattedObj.easiness,
+                                chilli: formattedObj.chili
+                            }
+                        });
                     }
-                    resolve({
-                        queryName: name,
-                        data: p
-                    });
+                    else {
+                        resolve({
+                            queryName: name,
+                            data: null
+                        });
+                    }
                 });
             });
         });

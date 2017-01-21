@@ -9,10 +9,17 @@ export default class ScoreResolver{
     rateTbl:mongodb.Collection;
     uniTbl:mongodb.Collection;
     log: bunyan;
+    projection = {
+        count: 1,
+        quality: 1,
+        easiness: 1,
+        chilli: 1,
+        _id: 0
+    };
 
     constructor(log:bunyan){
         this.log = log;
-
+        
         mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
             if(err)
                 log.error(err);
@@ -33,7 +40,7 @@ export default class ScoreResolver{
 
             let scraper = rmp(university);
             return Promise.all(names.map(v => this.rmpGet(v, scraper, university)));
-        })   
+        });
     }
 
     rmpGet(name:String, scraper: any, university:String):Promise<returnedQuery>{
@@ -41,7 +48,7 @@ export default class ScoreResolver{
         name = name.toLowerCase();
 
         return new Promise((resolve, reject) => { 
-            this.rateTbl.findOne({university, name})
+            this.rateTbl.findOne({university, name}, this.projection)
             .then(r => {
                 if(r != null){
                     resolve({
@@ -60,19 +67,39 @@ export default class ScoreResolver{
 
                 scraper.get(name, (p:Professor|null) => {
                     if(p !== null){
-                        this.rateTbl.update({university, name}, Object.assign({}, p, {name}), {upsert: true});
+                        
+                        /** Make the names lowercase, counts the amount of ratings */
+                        let formattedObj = Object.assign({}, p, {
+                            name,
+                            fname: p.fname.toLowerCase(), 
+                            lname: p.lname.toLowerCase(), 
+                            count: p.comments.length,
+                            help: undefined,
+                            clarity: undefined,
+                            grade: undefined
+                        });
+                        
+                        this.rateTbl.update({university, name}, formattedObj, {upsert: true});
+                        resolve({
+                            queryName: name,
+                            data: {
+                                count: formattedObj.count,
+                                quality: formattedObj.quality,
+                                easiness: formattedObj.easiness,
+                                chilli: formattedObj.chili
+                            }
+                        });
+                    } else {
+                        resolve({
+                            queryName: name,
+                            data: null
+                        });
                     }
-                    resolve({
-                        queryName: name,
-                        data: p
-                    });
-                })
+                });
             });
         });
     }
 }
-
-
 
 interface returnedQuery{
     queryName: String;
