@@ -40,9 +40,3 @@ export function getReviews(names){
 export function suggestReview(name, url){
 
 }
-
-export class timeConflictChecker{
-    constructor(){
-        this.raw = [];
-    }
-}

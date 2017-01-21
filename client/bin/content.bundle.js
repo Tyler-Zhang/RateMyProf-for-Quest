@@ -115,9 +115,6 @@
 	});
 	exports.getReviews = getReviews;
 	exports.suggestReview = suggestReview;
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 	function base(api, body) {
 
 	    var obj = Object.assign({}, body, { school: "University of Waterloo" });
@@ -158,12 +155,6 @@
 	 */
 	function suggestReview(name, url) {}
 
-	var timeConflictChecker = exports.timeConflictChecker = function timeConflictChecker() {
-	    _classCallCheck(this, timeConflictChecker);
-
-	    this.raw = [];
-	};
-
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
@@ -179,6 +170,8 @@
 	exports.default = s_SearchClass;
 
 	var _api = __webpack_require__(1);
+
+	var _util = __webpack_require__(6);
 
 	var displayed_Headings = [{
 	    name: "Quality",
@@ -208,7 +201,6 @@
 	    colored_inverted: false}*/
 	];
 
-	var colors = ["darkRed", "red", "orange", "yellow", "lightGreen", "green"];
 	var maxScore = 5;
 	var cellStyle = {
 	    height: "50px"
@@ -285,12 +277,8 @@
 
 	                /**If we want to color the cell */
 	                if (h.colored) {
-	                    var idx = void 0;
 	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
-
-	                    if (workingVal <= 1.5) idx = 0;else if (workingVal <= 2) idx = 1;else if (workingVal <= 3) idx = 2;else if (workingVal <= 3.8) idx = 3;else if (workingVal <= 4.4) idx = 4;else idx = 5;
-
-	                    var color = colors[idx];
+	                    var color = (0, _util.calculateColor)(workingVal, maxScore);
 	                    cell.css("background-color", color);
 	                }
 	            });
@@ -2612,6 +2600,34 @@
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.calculateColor = calculateColor;
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var colors = exports.colors = ["darkRed", "red", "orange", "yellow", "lightGreen", "green"];
+
+	/**
+	 * @todo turn this into a calculation that involves statistics
+	 */
+	function calculateColor(val, max) {
+	    if (val <= 1.5) return colors[0];else if (val <= 2) return colors[1];else if (val <= 3) return colors[2];else if (val <= 3.8) return colors[3];else if (val <= 4.4) return colors[4];else return colors[5];
+	}
+
+	var timeConflictChecker = exports.timeConflictChecker = function timeConflictChecker() {
+	    _classCallCheck(this, timeConflictChecker);
+
+	    this.raw = [];
+	};
 
 /***/ }
 /******/ ]);
