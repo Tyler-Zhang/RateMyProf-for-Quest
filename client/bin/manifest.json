@@ -8,7 +8,8 @@
       {
           "matches": ["*://quest.pecs.uwaterloo.ca/*"],
           "js": ["content.bundle.js"],
-          "run_at": "document_end"
+          "run_at": "document_end",
+          "all_frames": true
       }
   ],
   "background": {

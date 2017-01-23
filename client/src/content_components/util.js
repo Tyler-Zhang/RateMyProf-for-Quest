@@ -24,9 +24,3 @@ export function calculateColor(val, max){
     else
         return colors[5];
 }
-
-export class timeConflictChecker{
-    constructor(){
-        this.raw = [];
-    }
-}

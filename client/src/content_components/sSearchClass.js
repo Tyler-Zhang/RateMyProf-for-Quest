@@ -1,3 +1,4 @@
+import {ConflictChecker, getSuffix, parseScheduleFormat} from "timeConflictChecker";
 import {getReviews} from "api";
 import {calculateColor, colors} from "util";
 
@@ -45,13 +46,14 @@ export default function s_SearchClass(){
     if(teachers == null || teachers.length <= 0){
         return false; // Teachers weren't found using this method, move onto the next method
     }
-    let that = this;
-    setTimeout(() => renderPage.call(that, mainTable, teachers), 0);
+    renderPage(mainTable, teachers);
     return true;
 }
 
 function renderPage(mainTable, teachers){
     
+    let conflictChecker = parseCurrentClasses();
+
     mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
     let insHeading = mainTable.find("th[abbr='Instructor']");    // Find all heading called "instructor" so we can append more headings after them
     let headingTemplate = insHeading.first();       // Get a heading template
@@ -69,12 +71,23 @@ function renderPage(mainTable, teachers){
 
     // Inserts the headings after the "instructors" heading
     insHeading.after(headings);
-
+    console.log(conflictChecker);
     teachers.each((i, e) => {
         /** Hack because of know jquery bug */
         let ele = score.map(v => $(v).clone());
         $(e).closest("td").after(ele);
-        $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+        let personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+        let timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
+        let time = timeSpan.html();
+
+        if(time === "TBA")
+            return;
+
+        let overlap = conflictChecker.check(...parseScheduleFormat(time)).map(v => 
+            $("<p>", {style: "color:red; font-size:10px;"}).html(`Conflicts with ${v}`))
+
+        timeSpan.append(overlap);
+
     });
 
     // Extract all the actual teachers
@@ -92,7 +105,7 @@ function renderPage(mainTable, teachers){
 
             // Get the row with the professor's information
             let profRow = mainTable.find(`tr[rmpquest-name='${name}']`);
-            console.log(data);
+
             displayed_Headings.forEach(h => {
                 let val = data[h.key];
                 let cell = profRow.find(`td[rmpquest-type='${h.key}']`); // Get rating cell
@@ -108,4 +121,33 @@ function renderPage(mainTable, teachers){
             })            
         })
     });
+}
+
+
+
+function parseCurrentClasses(){
+    let conflictChecker = new ConflictChecker();
+
+    let mainTable = $("#STDNT_ENRL_SSVW\\$scroll\\$0");
+    let rows = mainTable.find("tr");
+
+    let currSubject;
+    let sameSubjectCount;
+
+    for(let x = 0; x < rows.length; x ++){
+        let curr = $(rows.get(x)).find("span");
+        let course = curr[0].innerHTML;
+        let times = curr[1].innerHTML;
+
+        if(course != "&nbsp;"){
+            currSubject = course;
+            sameSubjectCount = 0;
+        } else {
+            sameSubjectCount ++;
+        }
+
+        conflictChecker.add(currSubject + getSuffix(sameSubjectCount), ...parseScheduleFormat(times));
+    }
+
+    return conflictChecker;
 }

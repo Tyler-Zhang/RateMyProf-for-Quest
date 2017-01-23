@@ -169,9 +169,13 @@
 
 	exports.default = s_SearchClass;
 
+	var _timeConflictChecker = __webpack_require__(7);
+
 	var _api = __webpack_require__(1);
 
 	var _util = __webpack_require__(6);
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var displayed_Headings = [{
 	    name: "Quality",
@@ -214,14 +218,13 @@
 	    if (teachers == null || teachers.length <= 0) {
 	        return false; // Teachers weren't found using this method, move onto the next method
 	    }
-	    var that = this;
-	    setTimeout(function () {
-	        return renderPage.call(that, mainTable, teachers);
-	    }, 0);
+	    renderPage(mainTable, teachers);
 	    return true;
 	}
 
 	function renderPage(mainTable, teachers) {
+
+	    var conflictChecker = parseCurrentClasses();
 
 	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
 	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
@@ -246,14 +249,24 @@
 
 
 	    insHeading.after(headings);
-
+	    console.log(conflictChecker);
 	    teachers.each(function (i, e) {
 	        /** Hack because of know jquery bug */
 	        var ele = score.map(function (v) {
 	            return $(v).clone();
 	        });
 	        $(e).closest("td").after(ele);
-	        $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+	        var timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
+	        var time = timeSpan.html();
+
+	        if (time === "TBA") return;
+
+	        var overlap = conflictChecker.check.apply(conflictChecker, _toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(time))).map(function (v) {
+	            return $("<p>", { style: "color:red; font-size:10px;" }).html("Conflicts with " + v);
+	        });
+
+	        timeSpan.append(overlap);
 	    });
 
 	    // Extract all the actual teachers
@@ -275,7 +288,7 @@
 
 	            // Get the row with the professor's information
 	            var profRow = mainTable.find("tr[rmpquest-name='" + name + "']");
-	            console.log(data);
+
 	            displayed_Headings.forEach(function (h) {
 	                var val = data[h.key];
 	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
@@ -291,6 +304,33 @@
 	            });
 	        });
 	    });
+	}
+
+	function parseCurrentClasses() {
+	    var conflictChecker = new _timeConflictChecker.ConflictChecker();
+
+	    var mainTable = $("#STDNT_ENRL_SSVW\\$scroll\\$0");
+	    var rows = mainTable.find("tr");
+
+	    var currSubject = void 0;
+	    var sameSubjectCount = void 0;
+
+	    for (var x = 0; x < rows.length; x++) {
+	        var curr = $(rows.get(x)).find("span");
+	        var course = curr[0].innerHTML;
+	        var times = curr[1].innerHTML;
+
+	        if (course != "&nbsp;") {
+	            currSubject = course;
+	            sameSubjectCount = 0;
+	        } else {
+	            sameSubjectCount++;
+	        }
+
+	        conflictChecker.add.apply(conflictChecker, [currSubject + (0, _timeConflictChecker.getSuffix)(sameSubjectCount)].concat(_toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(times))));
+	    }
+
+	    return conflictChecker;
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
@@ -2616,9 +2656,6 @@
 	    value: true
 	});
 	exports.calculateColor = calculateColor;
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 	var colors = exports.colors = ["darkRed", "red", "orange", "yellow", "lightGreen", "green"];
 
 	/**
@@ -2628,11 +2665,140 @@
 	    if (val <= 1.5) return colors[0];else if (val <= 2) return colors[1];else if (val <= 3) return colors[2];else if (val <= 3.8) return colors[3];else if (val <= 4.4) return colors[4];else return colors[5];
 	}
 
-	var timeConflictChecker = exports.timeConflictChecker = function timeConflictChecker() {
-	    _classCallCheck(this, timeConflictChecker);
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
 
-	    this.raw = [];
-	};
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	exports.getSuffix = getSuffix;
+	exports.timeToMinute = timeToMinute;
+	exports.parseScheduleFormat = parseScheduleFormat;
+	exports.parseDate = parseDate;
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var ConflictChecker = exports.ConflictChecker = function () {
+	    function ConflictChecker() {
+	        _classCallCheck(this, ConflictChecker);
+
+	        this.times = [];
+	    }
+
+	    /**
+	     * @param {String} course Course code
+	     * @param {Integer} start time in minutes since start of the day where 0 <= Start <= 24 * 60
+	     * @param {Integer} end time in minutes since start of the day
+	     * @param {String} day in format MWF, etc
+	     */
+
+
+	    _createClass(ConflictChecker, [{
+	        key: "add",
+	        value: function add(course, day, start, end) {
+	            // Just incase there ever is a midnight course, so that the code doesn't fail
+	            var dateObj = { course: course, start: start, end: end <= start ? 24 * 60 + end : end, day: day };
+	            this.times.push(dateObj);
+	        }
+
+	        /**
+	         * @param {Integer} start time in minutes since the start of the day
+	         * @param {Integer} end
+	         * @param {String} day
+	         */
+
+	    }, {
+	        key: "check",
+	        value: function check(day, start, end) {
+	            var _this = this;
+
+	            var totalConflicts = []; // Array to account for the overrides;
+
+	            var _loop = function _loop(x) {
+	                var currEle = _this.times[x];
+
+	                if (!day.some(function (v) {
+	                    return currEle.day.includes(v);
+	                })) return "continue";
+	                if (start <= currEle.end && end >= currEle.start) totalConflicts.push(currEle.course);
+	            };
+
+	            for (var x = 0; x < this.times.length; x++) {
+	                var _ret = _loop(x);
+
+	                if (_ret === "continue") continue;
+	            }
+
+	            return totalConflicts;
+	        }
+	    }]);
+
+	    return ConflictChecker;
+	}();
+
+	var suffix = ["", "- midterm", "- final"];
+	/**
+	 * @param {Integer} idx the nth appearence of that course
+	 * @return {String}
+	 */
+	function getSuffix(idx) {
+	    if (idx > suffix.length) return "";else return suffix[idx];
+	}
+
+	var hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
+	/**
+	 * @param {String} time in format 12:56pm
+	 */
+	function timeToMinute(time) {
+	    var result = time.match(hourMinuteRegex);
+	    if (result == null || result.length != 4) {
+	        throw new Error("Invalid time format " + time);
+	    }
+
+	    var totalMinutes = 0;
+	    var hour = Number(result[1]);
+	    totalMinutes += (hour == 12 ? 0 : hour) * 60;
+	    totalMinutes += Number(result[2]);
+	    totalMinutes += result[3] == "PM" ? 12 * 60 : 0;
+
+	    return totalMinutes;
+	}
+
+	var timeRegex = /(\w+) (.+) - (.+)/;
+	/**
+	 * @param {String} sched in format TWFSu 10:45pm - 11:12pm
+	 * @returns {String[]}
+	 */
+	function parseScheduleFormat(sched) {
+	    var parsedTimeResult = sched.match(timeRegex);
+
+	    if (parsedTimeResult == null || parsedTimeResult.length != 4) {
+	        throw new error("Invalid schedule format " + sched);
+	    }
+	    var dates = parseDate(parsedTimeResult[1]);
+	    var startTime = timeToMinute(parsedTimeResult[2]);
+	    var endTime = timeToMinute(parsedTimeResult[3]);
+
+	    return [dates, startTime, endTime];
+	}
+
+	var dateRegExp = /([A-Z][a-z]?)/g;
+
+	/**
+	 * Parses the days of the week format into seperate elements in a array eg MWFSSu
+	 * @param {String} date in format of MWFSu, etc
+	 * @returns {String[]} of the parsed dates
+	 */
+	function parseDate(date) {
+	    var rtn = date.match(dateRegExp);
+	    if (rtn == null) return [];else return rtn;
+	}
 
 /***/ }
 /******/ ]);
