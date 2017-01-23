@@ -11,6 +11,7 @@ class ScoreResolver {
             easiness: 1,
             chilli: 1,
             topTag: 1,
+            url: 1,
             _id: 0
         };
         this.log = log;
@@ -76,7 +77,8 @@ class ScoreResolver {
                                 quality: formattedObj.quality,
                                 easiness: formattedObj.easiness,
                                 chilli: formattedObj.chili,
-                                topTag: formattedObj.topTag
+                                topTag: formattedObj.topTag,
+                                url: formattedObj.url
                             }
                         });
                     }
