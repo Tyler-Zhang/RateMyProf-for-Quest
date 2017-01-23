@@ -272,8 +272,8 @@
 	    // Extract all the actual teachers
 	    var teacherNames = teachers.toArray().map(function (v) {
 	        return v.innerHTML;
-	    }).filter(function (v) {
-	        return v.toLowerCase() != "staff";
+	    }).filter(function (v, i, a) {
+	        if (v.toLowerCase() === "staff") return false;else return a.indexOf(v) == i;
 	    });
 
 	    (0, _api.getReviews)(teacherNames).then(function (d) {

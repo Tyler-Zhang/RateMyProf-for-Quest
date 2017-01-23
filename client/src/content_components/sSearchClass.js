@@ -91,7 +91,12 @@ function renderPage(mainTable, teachers){
     });
 
     // Extract all the actual teachers
-    let teacherNames = teachers.toArray().map(v => v.innerHTML).filter(v => v.toLowerCase() != "staff");
+    let teacherNames = teachers.toArray().map(v => v.innerHTML).filter((v, i, a) => {
+        if(v.toLowerCase() === "staff")
+            return false;
+        else
+            return a.indexOf(v) == i;
+    });
     
     getReviews(teacherNames).then(d => {
         d.forEach(v => {
