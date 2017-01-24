@@ -79,7 +79,7 @@ app.post("/suggest", (req, res) => {
     
     suggestTbl.findOne({university, name, link}).then(d => {
         if(d !== null)
-            return suggestTbl.updateOne({university, name, link}, {$inc: "count"});
+            return suggestTbl.updateOne({university, name, link}, {$inc: {count: 1}});
         else
             return suggestTbl.insertOne({university, name, link, count: 1});
     }).then(d => {
