@@ -1,5 +1,6 @@
 import {getReviews} from "api";
 import s_SearchClass from "sSearchClass";
+import s_ClassSched from "sClassSched";
 
 const refresh = 1000;
 
@@ -40,6 +41,7 @@ if(parent == top)
 function beginSearch(){
     let sPipeline = new searchPipeline();
     sPipeline.use(s_SearchClass);
+    sPipeline.use(s_ClassSched);
 
     sPipeline.search();
 }

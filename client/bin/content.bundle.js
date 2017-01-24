@@ -54,6 +54,10 @@
 
 	var _sSearchClass2 = _interopRequireDefault(_sSearchClass);
 
+	var _sClassSched = __webpack_require__(8);
+
+	var _sClassSched2 = _interopRequireDefault(_sClassSched);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -105,6 +109,7 @@
 	function beginSearch() {
 	    var sPipeline = new searchPipeline();
 	    sPipeline.use(_sSearchClass2.default);
+	    sPipeline.use(_sClassSched2.default);
 
 	    sPipeline.search();
 	}
@@ -2829,6 +2834,160 @@
 	function calculateColor(val, max) {
 	    if (val <= 1.5) return colors[0];else if (val <= 2) return colors[1];else if (val <= 3) return colors[2];else if (val <= 3.8) return colors[3];else if (val <= 4.4) return colors[4];else return colors[5];
 	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	exports.default = s_ClassSched;
+
+	var _api = __webpack_require__(1);
+
+	var _util = __webpack_require__(7);
+
+	var displayed_Headings = [{
+	    name: "Quality",
+	    desc: "How generally awesome the professor is",
+	    key: "quality",
+	    colored: true,
+	    colored_inverted: false,
+	    offset: 0
+	}, {
+	    name: "Difficulty",
+	    desc: "How easy the professor is ",
+	    key: "easiness",
+	    colored: true,
+	    colored_inverted: true,
+	    offset: 1.5
+	}, {
+	    name: "Reviews",
+	    desc: "How many people have reviewed the professor",
+	    colored: false,
+	    key: "count"
+	}
+	/*{
+	    name: "Clarity",
+	    desc: "How clear the professor's lectures are",
+	    key: "clarity",
+	    colored: true,
+	    colored_inverted: false}*/
+	];
+
+	var maxScore = 5;
+	var cellStyle = {
+	    height: "50px"
+	};
+
+	function s_ClassSched() {
+	    var mainTable = $("#ACE_STDNT_ENRL_SSV2\\$0"); // Main table with most of the content
+	    // Get all teacher names on the page
+	    var teachers = mainTable.find("span[id^='DERIVED_CLS_DTL_SSR_INSTR_LONG\\$']");
+	    // If there are atleast one teacher not named staff
+	    if (teachers == null || teachers.length <= 0) {
+	        return false; // Teachers weren't found using this method, move onto the next method
+	    }
+	    renderPage(mainTable, teachers);
+	    return true;
+	}
+
+	function renderPage(mainTable, teachers) {
+
+	    /** Enlarge the tables for better readability */
+	    mainTable.find("table[id^='SSR_DUMMY_RECVW\\$scroll\\$']").attr("width", 700);
+	    mainTable.find("table[id^='CLASS_MTG_VW\\$scroll\\$']").attr("width", 700);
+
+	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
+	    var headingTemplate = insHeading.first(); // Get a heading template
+
+	    /** Generates the headings for each class depending on the displayed_Headings array */
+
+	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
+	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white; border-style:solid; border-width:1" }).html("N/A");
+
+	        var currHeading = headingTemplate.clone();
+	        currHeading.attr("width", 60);
+	        currHeading.html(b.name);
+
+	        return [a[0].concat(currHeading), a[1].concat(currScore)];
+	    }, [[], []]),
+	        _displayed_Headings$r2 = _slicedToArray(_displayed_Headings$r, 2),
+	        headings = _displayed_Headings$r2[0],
+	        score = _displayed_Headings$r2[1];
+
+	    // Inserts the headings after the "instructors" heading
+
+
+	    insHeading.after(headings);
+	    teachers.each(function (i, e) {
+	        /** Hack because of know jquery bug */
+	        var ele = score.map(function (v) {
+	            return $(v).clone();
+	        });
+	        $(e).closest("td").after(ele);
+	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+	    });
+
+	    // Extract all the actual teachers
+	    var teacherNames = teachers.toArray().map(function (v) {
+	        return v.innerHTML;
+	    }).filter(function (v, i, a) {
+	        if (v.toLowerCase() === "staff") return false;else return a.indexOf(v) == i;
+	    });
+
+	    (0, _api.getReviews)(teacherNames).then(function (d) {
+	        d.forEach(function (v) {
+	            var name = v.queryName;
+	            var data = v.data;
+	            var profRow = mainTable.find("tr[rmpquest-name=\"" + name + "\"]");
+
+	            var profName = profRow.find("span[id^='DERIVED_CLS_DTL_SSR_INSTR_LONG\\$']");
+	            if (data == null) {
+	                // Nothing was found o
+	                profName.wrap($("<a>", {
+	                    title: "Suggest a link for this teacher",
+	                    href: "javascript:void(0)" }).click(function () {
+	                    return suggestHandler(name);
+	                }));
+	                return;
+	            }
+	            profName.wrap($("<a>", {
+	                title: "Checkout the rate my prof page",
+	                href: "javascript:window.open('" + v.data.url + "', '_blank')" }));
+
+	            displayed_Headings.forEach(function (h) {
+	                var val = data[h.key];
+	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
+
+	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
+
+	                /**If we want to color the cell */
+	                if (h.colored) {
+	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
+	                    var color = (0, _util.calculateColor)(workingVal, maxScore);
+	                    cell.css("background-color", color);
+	                }
+	            });
+	        });
+	    });
+	}
+
+	function suggestHandler(name) {
+	    chrome.runtime.sendMessage({
+	        name: name,
+	        message: "openSuggest"
+	    }, function (response) {
+	        if (response == false) console.error("Couldn't open the webpage");
+	    });
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }
 /******/ ]);
