@@ -107,8 +107,8 @@
 	    window.location = src;
 	} else {
 	    beginSearch();
-	}
-	*/
+	}*/
+
 	if (iframe == null) beginSearch();
 
 	function beginSearch() {
@@ -2884,8 +2884,6 @@
 	    height: "50px"
 	};
 
-	var und = "javascript:void(0)";
-
 	function s_ClassSched() {
 	    var mainTable = $("#ACE_STDNT_ENRL_SSV2\\$0"); // Main table with most of the content
 	    // Get all teacher names on the page
@@ -2932,9 +2930,7 @@
 	            return $(v).clone();
 	        });
 	        $(e).closest("td").after(ele);
-	        var row = $(e).closest("tr").attr({ "rmpquest-name": e.innerHTML.toLowerCase(), onmouseover: und, onclick: und, onmouseout: und });
-	        var clonedChild = row.children().clone();
-	        row.empty().append(clonedChild);
+	        var row = $(e).closest("tr").attr({ "rmpquest-name": e.innerHTML.toLowerCase(), id: "" });
 	    });
 
 	    // Extract all the actual teachers

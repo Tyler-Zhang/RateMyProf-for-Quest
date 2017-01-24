@@ -38,8 +38,8 @@ if(iframe != null){
     window.location = src;
 } else {
     beginSearch();
-}
-*/
+}*/
+
 if(iframe == null)
     beginSearch();
 

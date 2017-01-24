@@ -31,8 +31,6 @@ const cellStyle = {
     height: "50px"
 }
 
-const und = "javascript:void(0)";
-
 export default function s_ClassSched(){
     let mainTable = $("#ACE_STDNT_ENRL_SSV2\\$0"); // Main table with most of the content
     // Get all teacher names on the page
@@ -46,7 +44,7 @@ export default function s_ClassSched(){
 }
 
 function renderPage(mainTable, teachers){
-    
+
     /** Enlarge the tables for better readability */
     mainTable.find("table[id^='SSR_DUMMY_RECVW\\$scroll\\$']").attr("width", 700);
     mainTable.find("table[id^='CLASS_MTG_VW\\$scroll\\$']").attr("width", 700);
@@ -71,10 +69,7 @@ function renderPage(mainTable, teachers){
         /** Hack because of know jquery bug */
         let ele = score.map(v => $(v).clone());
         $(e).closest("td").after(ele);
-        let row = $(e).closest("tr").attr({"rmpquest-name": e.innerHTML.toLowerCase(), onmouseover:und, onclick:und, onmouseout:und});
-        let clonedChild = row.children().clone();
-        row.empty().append(clonedChild);
-
+        let row = $(e).closest("tr").attr({"rmpquest-name": e.innerHTML.toLowerCase(), id:""});
     });
 
     // Extract all the actual teachers
