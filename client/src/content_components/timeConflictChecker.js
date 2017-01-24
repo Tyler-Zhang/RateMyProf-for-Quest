@@ -54,7 +54,7 @@ export function getSuffix(idx){
 
 const hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
 /**
- * @param {String} time in format 12:56pm
+ * @param {String} time in format 12:56pm or 23:12
  */
 export function timeToMinute(time){
     let result = time.match(hourMinuteRegex);
@@ -66,8 +66,8 @@ export function timeToMinute(time){
     let hour = Number(result[1]);
     let minutes = Number(result[2]);
 
-    if(result.length == 3){
-        return hour * 60 + minutes;
+    if(result.length == 3){ // If it is 24 hour format
+        return (hour - 12) * 60 + minutes;
     }
 
     totalMinutes += ((hour == 12)? 0 : hour) * 60;

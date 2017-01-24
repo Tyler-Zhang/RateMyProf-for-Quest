@@ -2757,7 +2757,7 @@
 
 	var hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
 	/**
-	 * @param {String} time in format 12:56pm
+	 * @param {String} time in format 12:56pm or 23:12
 	 */
 	function timeToMinute(time) {
 	    var result = time.match(hourMinuteRegex);
@@ -2770,7 +2770,8 @@
 	    var minutes = Number(result[2]);
 
 	    if (result.length == 3) {
-	        return hour * 60 + minutes;
+	        // If it is 24 hour format
+	        return (hour - 12) * 60 + minutes;
 	    }
 
 	    totalMinutes += (hour == 12 ? 0 : hour) * 60;
