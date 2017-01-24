@@ -8,7 +8,8 @@
       {
           "matches": ["*://quest.pecs.uwaterloo.ca/*"],
           "js": ["content.bundle.js"],
-          "run_at": "document_end"
+          "run_at": "document_end",
+          "all_frames": true
       }
   ],
   "background": {
@@ -20,6 +21,9 @@
     "default_popup": "popup.html",
     "default_title": "Change Settings"
   },
+  "web_accessible_resources": [
+    "suggest.html"
+  ],
   "permissions": [
     "storage",
     "activeTab",

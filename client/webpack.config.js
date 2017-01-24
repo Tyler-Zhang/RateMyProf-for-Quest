@@ -25,8 +25,10 @@ if(!debug)
 
  module.exports = {
      entry: {
-         content:'./src/app-content.js',
-         background:'./src/app-background.js'},
+        content:'./src/app-content.js',
+        background:'./src/app-background.js',
+        suggest:'./src/app-suggest.js'
+    },
      output: {
          path: './bin',
          filename: '[name].bundle.js'

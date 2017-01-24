@@ -9,6 +9,15 @@ export default class ScoreResolver{
     rateTbl:mongodb.Collection;
     uniTbl:mongodb.Collection;
     log: bunyan;
+    projection = {
+        count: 1,
+        quality: 1,
+        easiness: 1,
+        chilli: 1,
+        topTag: 1,
+        url: 1,
+        _id: 0
+    };
 
     constructor(log:bunyan){
         this.log = log;
@@ -33,47 +42,70 @@ export default class ScoreResolver{
 
             let scraper = rmp(university);
             return Promise.all(names.map(v => this.rmpGet(v, scraper, university)));
-        })   
+        });
     }
 
     rmpGet(name:String, scraper: any, university:String):Promise<returnedQuery>{
         // This way the database won't have duplicates due to capitalization
         name = name.toLowerCase();
 
-        return new Promise((resolve, reject) => {
-            this.rateTbl.findOne({university, name})
+        return new Promise((resolve, reject) => { 
+            this.rateTbl.findOne({university, name}, this.projection)
             .then(r => {
                 if(r != null){
                     resolve({
                         queryName: name,
                         data: r
                     });
-                    console.log("fulfilled!!");
-                    return {fulfilled: true};
-                } else return {fulfilled: false};
+                    return true;
+                } else return false;
             }, e => {
                 this.log.error(e);
+                return false;
             })
             .then(v => {
-                if(v.fulfilled == true)
+                if(v === true)
                     return;
-                
-                console.log(v);
+
                 scraper.get(name, (p:Professor|null) => {
                     if(p !== null){
-                        this.rateTbl.insertOne(Object.assign({}, p, {name}));
+                        
+                        /** Make the names lowercase, counts the amount of ratings */
+                        let formattedObj = Object.assign({}, p, {
+                            name,
+                            fname: p.fname.toLowerCase(), 
+                            lname: p.lname.toLowerCase(), 
+                            count: p.comments.length
+                        });
+
+                        /** Delete these useless fields, they're always the same as easiness*/
+                        delete formattedObj.help;
+                        delete formattedObj.clarity;
+                        delete formattedObj.grade;
+                        
+                        this.rateTbl.update({university, name}, formattedObj, {upsert: true});
+                        resolve({
+                            queryName: name,
+                            data: {
+                                count: formattedObj.count,
+                                quality: formattedObj.quality,
+                                easiness: formattedObj.easiness,
+                                chilli: formattedObj.chili,
+                                topTag: formattedObj.topTag,
+                                url: formattedObj.url
+                            }
+                        });
+                    } else {
+                        resolve({
+                            queryName: name,
+                            data: null
+                        });
                     }
-                    resolve({
-                        queryName: name,
-                        data: p
-                    });
-                })
+                });
             });
         });
     }
 }
-
-
 
 interface returnedQuery{
     queryName: String;
@@ -90,5 +122,7 @@ interface Professor{
     grade: String;
     chili: String;
     url: String;
+    clarity:String;
     comments: String[];
+    topTag: String;
 }

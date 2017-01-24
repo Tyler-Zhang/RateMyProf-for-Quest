@@ -1,6 +1,8 @@
 import {getReviews} from "api";
 import s_SearchClass from "sSearchClass";
 
+const refresh = 1000;
+
 class searchPipeline{
     constructor(){
         this.steps = [];
@@ -16,13 +18,13 @@ class searchPipeline{
             if(result === true)
                 return;
         }
-        setTimeout(this.search.bind(this), 2000);
+        setTimeout(this.search.bind(this), refresh);
     }
 }
+/*
 
 const iframeID = "ptifrmtgtframe";
 let iframe = document.getElementById(iframeID);
-
 
 // If there is an iframe detected in the browser, redirect to the source of the iframe
 if(iframe != null){
@@ -31,6 +33,9 @@ if(iframe != null){
 } else {
     beginSearch();
 }
+*/
+if(parent == top)
+    beginSearch();
 
 function beginSearch(){
     let sPipeline = new searchPipeline();
