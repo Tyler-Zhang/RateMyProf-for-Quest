@@ -1,6 +1,5 @@
 const universityName = "University of Waterloo"
 
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message == 'openSuggest') {
       chrome.tabs.create({

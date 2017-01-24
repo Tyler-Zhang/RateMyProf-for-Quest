@@ -36,6 +36,6 @@ export function getReviews(names){
  * @param {String} name the name of the professors
  * @param {String} url the url of the rate my prof page
  */
-export function suggestReview(name, university, url){
-    return base("/suggest", {name, university, url});
+export function suggestReview(name, university, link){
+    return base("/suggest", {name, university, link});
 }

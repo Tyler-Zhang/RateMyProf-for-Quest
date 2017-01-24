@@ -134,8 +134,8 @@
 	 * @param {String} name the name of the professors
 	 * @param {String} url the url of the rate my prof page
 	 */
-	function suggestReview(name, university, url) {
-	    return base("/suggest", { name: name, university: university, url: url });
+	function suggestReview(name, university, link) {
+	    return base("/suggest", { name: name, university: university, link: link });
 	}
 
 /***/ },

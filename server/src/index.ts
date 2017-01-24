@@ -5,6 +5,7 @@ import * as express from "express";
 import * as path from "path";
 import * as bodyParser from "body-parser";
 import * as bunyan from "bunyan";
+import * as mongodb from "mongodb";
 import * as fs from "fs";
 import ScoreResolver from "./scorer";
 
@@ -16,6 +17,16 @@ const log = bunyan.createLogger({
         {level: "debug", stream: process.stdout},
         {level: "warn", path: "logs.log"}
     ]
+});
+let mongoCli = mongodb.MongoClient;
+let suggestTbl: mongodb.Collection;
+mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
+    if(err)
+        log.error(err);
+    else {
+        suggestTbl = d.collection("suggest");
+        log.info("Connected to mongodb");
+    }
 });
 
 let Scorer = new ScoreResolver(log);
@@ -53,6 +64,32 @@ app.post("/getReviews", (req, res) => {
         else res.json({success: true, body: d});
     });
     
+});
+
+app.post("/suggest", (req, res) => {
+    let {university, name, link} = req.body;
+
+    if(university == null || name == null || link == null){
+        return res.status(300).json({success: false, message: "missing fields"});
+    }
+
+    let regex = /https:\/\/www\.ratemyprofessors\.com\/ShowRatings\.jsp\?tid=\d+/;
+    if(!regex.test(link))
+        return res.status(300).json({success: false, message: "invalid link"});
+    
+    suggestTbl.findOne({university, name, link}).then(d => {
+        if(d !== null)
+            return suggestTbl.updateOne({university, name, link}, {$inc: "count"});
+        else
+            return suggestTbl.insertOne({university, name, link, count: 1});
+    }).then(d => {
+        res.status(200).json({success: true, message: "Successful"});
+    }, e => {
+        log.error(e);
+        res.status(400).json({success: false, message: "Our servers messed up"});
+    })
+
+
 });
 
 app.post("*", (req, res) => {
