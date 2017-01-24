@@ -2,7 +2,8 @@
   "manifest_version": 2,
 
   "name": "Waterloo Quest+",
-  "description": "This extension inject professor reviews into university websites",
+  "short_name": "WQ+",
+  "description": "Helpful improvements for Waterloo's Quest System",
   "version": "1",
   "content_scripts": [
       {
@@ -15,12 +16,6 @@
   "background": {
     "scripts": ["background.bundle.js"]
   },
-/*
-  "browser_action": {
-    "default_icon": "icon.png"  
-    //"default_popup": "popup.html",
-    //"default_title": "Change Settings"
-  },*/
   "web_accessible_resources": [
     "suggest.html"
   ],
@@ -30,7 +25,7 @@
     "https://ajax.googleapis.com/"
   ],
   "icons": {
-    "56": "icon256.png",
-    "28": "icon128.png"
+    "128": "icon128.png",
+    "32": "icon64.png"
   }
 }
