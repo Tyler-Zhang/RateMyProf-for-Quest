@@ -21,6 +21,9 @@
     "default_popup": "popup.html",
     "default_title": "Change Settings"
   },
+  "web_accessible_resources": [
+    "suggest.html"
+  ],
   "permissions": [
     "storage",
     "activeTab",

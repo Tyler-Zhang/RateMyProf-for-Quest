@@ -30,13 +30,12 @@ function base(api, body){
  * @param {String[]} names The names of the professors
  */
 export function getReviews(names){
-    console.log(names);
     return base("/getReviews", {names});
 }
 /**
  * @param {String} name the name of the professors
  * @param {String} url the url of the rate my prof page
  */
-export function suggestReview(name, url){
-
+export function suggestReview(name, university, url){
+    return base("/suggest", {name, university, url});
 }

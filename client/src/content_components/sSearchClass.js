@@ -17,14 +17,14 @@ const displayed_Headings = [
         key: "easiness",
         colored: true,
         colored_inverted: true,
-        offset: 1.5},
+        offset: 1.5
+    },
     {
         name: "Reviews",
         desc: "How many people have reviewed the professor",
         colored: false,
         key: "count"
     }
-
     /*{
         name: "Clarity",
         desc: "How clear the professor's lectures are",
@@ -80,7 +80,7 @@ function renderPage(mainTable, teachers){
         let timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
         let time = timeSpan.html();
 
-        if(time === "TBA")
+        if(time === "TBA")  // Don't know the time yet
             return;
 
         let overlap = conflictChecker.check(...parseScheduleFormat(time)).map(v => 
@@ -102,15 +102,19 @@ function renderPage(mainTable, teachers){
         d.forEach(v => {
             let name = v.queryName;
             let data = v.data;
-            if(data == null)    // Nothing was found o
-                return;
-            /**
-             * @todo put in a link to suggest a rmp link
-             */
-
-            // Get the row with the professor's information
             let profRow = mainTable.find(`tr[rmpquest-name='${name}']`);
-
+            
+            let profName = profRow.find("span[id^='MTG_INSTR\\$']");
+            if(data == null){    // Nothing was found o
+                profName.wrap($("<a>", {
+                    title: "Suggest a link for this teacher", 
+                    href:"javascript:void(0)"}).click(() => suggestHandler(name)));
+                return;
+            }
+                profName.wrap($("<a>", {
+                    title: "Checkout the rate my prof page", 
+                    href: `javascript:window.open('${v.data.url}', '_blank')`}));
+            
             displayed_Headings.forEach(h => {
                 let val = data[h.key];
                 let cell = profRow.find(`td[rmpquest-type='${h.key}']`); // Get rating cell
@@ -123,12 +127,20 @@ function renderPage(mainTable, teachers){
                     let color = calculateColor(workingVal, maxScore);
                     cell.css("background-color", color);
                 }
-            })            
+            });
         })
     });
 }
 
-
+function suggestHandler(name){
+    chrome.runtime.sendMessage({
+        name,
+        message: "openSuggest"
+    }, function(response) {
+        if(response == false)
+            console.error("Couldn't open the webpage");
+    });
+}
 
 function parseCurrentClasses(){
     let conflictChecker = new ConflictChecker();

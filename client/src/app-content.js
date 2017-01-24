@@ -21,10 +21,10 @@ class searchPipeline{
         setTimeout(this.search.bind(this), refresh);
     }
 }
+/*
 
 const iframeID = "ptifrmtgtframe";
 let iframe = document.getElementById(iframeID);
-
 
 // If there is an iframe detected in the browser, redirect to the source of the iframe
 if(iframe != null){
@@ -33,6 +33,9 @@ if(iframe != null){
 } else {
     beginSearch();
 }
+*/
+if(parent == top)
+    beginSearch();
 
 function beginSearch(){
     let sPipeline = new searchPipeline();

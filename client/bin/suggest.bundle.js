@@ -44,70 +44,47 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
 	var _api = __webpack_require__(1);
 
-	var _sSearchClass = __webpack_require__(2);
-
-	var _sSearchClass2 = _interopRequireDefault(_sSearchClass);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var refresh = 1000;
-
-	var searchPipeline = function () {
-	    function searchPipeline() {
-	        _classCallCheck(this, searchPipeline);
-
-	        this.steps = [];
-	    }
-
-	    _createClass(searchPipeline, [{
-	        key: "use",
-	        value: function use(func) {
-	            this.steps.push(func);
+	(function () {
+	    var data = function (a) {
+	        if (a == "") return {};
+	        var b = {};
+	        for (var i = 0; i < a.length; ++i) {
+	            var p = a[i].split('=', 2);
+	            if (p.length == 1) b[p[0]] = "";else b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
 	        }
-	    }, {
-	        key: "search",
-	        value: function search() {
-	            for (var x = 0; x < this.steps.length; x++) {
-	                var result = this.steps[x].apply(this);
-	                if (result === true) return;
-	            }
-	            setTimeout(this.search.bind(this), refresh);
+	        return b;
+	    }(window.location.search.substr(1).split('&'));
+
+	    var profString = "Suggest a link for " + capitalize(data.name).bold();
+	    var universityString = "At the " + capitalize(data.university).bold();
+
+	    $("#profName").html(profString);
+	    $("#universityName").html(universityString);
+
+	    $("#submit").click(function () {
+	        var link = $("#url").val();
+	        var regex = /https:\/\/www\.ratemyprofessors\.com\/ShowRatings\.jsp\?tid=\d+/;
+
+	        if (!regex.test(link)) alert("This url is not a valid rate my prof url");else {
+	            (0, _api.suggestReview)(data.name, data.university, link).then(function (d) {
+	                alert("Success!");
+	            }, function (e) {
+	                alert("Your submission couldn't be completed. Please try again");
+	            });
 	        }
-	    }]);
+	    });
+	})();
 
-	    return searchPipeline;
-	}();
-	/*
-
-	const iframeID = "ptifrmtgtframe";
-	let iframe = document.getElementById(iframeID);
-
-	// If there is an iframe detected in the browser, redirect to the source of the iframe
-	if(iframe != null){
-	    const src = iframe.src;
-	    window.location = src;
-	} else {
-	    beginSearch();
+	function capitalize(string) {
+	    return string.replace(/\b\w/g, function (l) {
+	        return l.toUpperCase();
+	    });
 	}
-	*/
-
-
-	if (parent == top) beginSearch();
-
-	function beginSearch() {
-	    var sPipeline = new searchPipeline();
-	    sPipeline.use(_sSearchClass2.default);
-
-	    sPipeline.search();
-	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
 /* 1 */
@@ -162,202 +139,7 @@
 	}
 
 /***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	exports.default = s_SearchClass;
-
-	var _timeConflictChecker = __webpack_require__(6);
-
-	var _api = __webpack_require__(1);
-
-	var _util = __webpack_require__(7);
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	var displayed_Headings = [{
-	    name: "Quality",
-	    desc: "How generally awesome the professor is",
-	    key: "quality",
-	    colored: true,
-	    colored_inverted: false,
-	    offset: 0
-	}, {
-	    name: "Difficulty",
-	    desc: "How easy the professor is ",
-	    key: "easiness",
-	    colored: true,
-	    colored_inverted: true,
-	    offset: 1.5
-	}, {
-	    name: "Reviews",
-	    desc: "How many people have reviewed the professor",
-	    colored: false,
-	    key: "count"
-	}
-	/*{
-	    name: "Clarity",
-	    desc: "How clear the professor's lectures are",
-	    key: "clarity",
-	    colored: true,
-	    colored_inverted: false}*/
-	];
-
-	var maxScore = 5;
-	var cellStyle = {
-	    height: "50px"
-	};
-
-	function s_SearchClass() {
-	    var mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
-	    // Get all teacher names on the page
-	    var teachers = mainTable.find("span[id^='MTG_INSTR']");
-	    // If there are atleast one teacher not named staff
-	    if (teachers == null || teachers.length <= 0) {
-	        return false; // Teachers weren't found using this method, move onto the next method
-	    }
-	    renderPage(mainTable, teachers);
-	    return true;
-	}
-
-	function renderPage(mainTable, teachers) {
-
-	    var conflictChecker = parseCurrentClasses();
-
-	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
-	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
-	    var headingTemplate = insHeading.first(); // Get a heading template
-
-	    /** Generates the headings for each class depending on the displayed_Headings array */
-
-	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
-	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white" }).html("N/A");
-
-	        var currHeading = headingTemplate.clone();
-	        currHeading.attr("width", 60);
-	        currHeading.children().attr({ id: "", href: "javascript: void(0)", title: b.desc }).html(b.name);
-
-	        return [a[0].concat(currHeading), a[1].concat(currScore)];
-	    }, [[], []]),
-	        _displayed_Headings$r2 = _slicedToArray(_displayed_Headings$r, 2),
-	        headings = _displayed_Headings$r2[0],
-	        score = _displayed_Headings$r2[1];
-
-	    // Inserts the headings after the "instructors" heading
-
-
-	    insHeading.after(headings);
-	    console.log(conflictChecker);
-	    teachers.each(function (i, e) {
-	        /** Hack because of know jquery bug */
-	        var ele = score.map(function (v) {
-	            return $(v).clone();
-	        });
-	        $(e).closest("td").after(ele);
-	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
-	        var timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
-	        var time = timeSpan.html();
-
-	        if (time === "TBA") // Don't know the time yet
-	            return;
-
-	        var overlap = conflictChecker.check.apply(conflictChecker, _toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(time))).map(function (v) {
-	            return $("<p>", { style: "color:red; font-size:10px;" }).html("Conflicts with " + v);
-	        });
-
-	        timeSpan.append(overlap);
-	    });
-
-	    // Extract all the actual teachers
-	    var teacherNames = teachers.toArray().map(function (v) {
-	        return v.innerHTML;
-	    }).filter(function (v, i, a) {
-	        if (v.toLowerCase() === "staff") return false;else return a.indexOf(v) == i;
-	    });
-
-	    (0, _api.getReviews)(teacherNames).then(function (d) {
-	        d.forEach(function (v) {
-	            var name = v.queryName;
-	            var data = v.data;
-	            var profRow = mainTable.find("tr[rmpquest-name='" + name + "']");
-
-	            var profName = profRow.find("span[id^='MTG_INSTR\\$']");
-	            if (data == null) {
-	                // Nothing was found o
-	                profName.wrap($("<a>", {
-	                    title: "Suggest a link for this teacher",
-	                    href: "javascript:void(0)" }).click(function () {
-	                    return suggestHandler(name);
-	                }));
-	                return;
-	            }
-	            profName.wrap($("<a>", {
-	                title: "Checkout the rate my prof page",
-	                href: "javascript:window.open('" + v.data.url + "', '_blank')" }));
-
-	            displayed_Headings.forEach(function (h) {
-	                var val = data[h.key];
-	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
-
-	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
-
-	                /**If we want to color the cell */
-	                if (h.colored) {
-	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
-	                    var color = (0, _util.calculateColor)(workingVal, maxScore);
-	                    cell.css("background-color", color);
-	                }
-	            });
-	        });
-	    });
-	}
-
-	function suggestHandler(name) {
-	    chrome.runtime.sendMessage({
-	        name: name,
-	        message: "openSuggest"
-	    }, function (response) {
-	        if (response == false) console.error("Couldn't open the webpage");
-	    });
-	}
-
-	function parseCurrentClasses() {
-	    var conflictChecker = new _timeConflictChecker.ConflictChecker();
-
-	    var mainTable = $("#STDNT_ENRL_SSVW\\$scroll\\$0");
-	    var rows = mainTable.find("tr");
-
-	    var currSubject = void 0;
-	    var sameSubjectCount = void 0;
-
-	    for (var x = 0; x < rows.length; x++) {
-	        var curr = $(rows.get(x)).find("span");
-	        var course = curr[0].innerHTML;
-	        var times = curr[1].innerHTML;
-
-	        if (course != "&nbsp;") {
-	            currSubject = course;
-	            sameSubjectCount = 0;
-	        } else {
-	            sameSubjectCount++;
-	        }
-
-	        conflictChecker.add.apply(conflictChecker, [currSubject + (0, _timeConflictChecker.getSuffix)(sameSubjectCount)].concat(_toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(times))));
-	    }
-
-	    return conflictChecker;
-	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ },
+/* 2 */,
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2668,160 +2450,6 @@
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	exports.getSuffix = getSuffix;
-	exports.timeToMinute = timeToMinute;
-	exports.parseScheduleFormat = parseScheduleFormat;
-	exports.parseDate = parseDate;
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var ConflictChecker = exports.ConflictChecker = function () {
-	    function ConflictChecker() {
-	        _classCallCheck(this, ConflictChecker);
-
-	        this.times = [];
-	    }
-
-	    /**
-	     * @param {String} course Course code
-	     * @param {Integer} start time in minutes since start of the day where 0 <= Start <= 24 * 60
-	     * @param {Integer} end time in minutes since start of the day
-	     * @param {String} day in format MWF, etc
-	     */
-
-
-	    _createClass(ConflictChecker, [{
-	        key: "add",
-	        value: function add(course, day, start, end) {
-	            // Just incase there ever is a midnight course, so that the code doesn't fail
-	            var dateObj = { course: course, start: start, end: end <= start ? 24 * 60 + end : end, day: day };
-	            this.times.push(dateObj);
-	        }
-
-	        /**
-	         * @param {Integer} start time in minutes since the start of the day
-	         * @param {Integer} end
-	         * @param {String} day
-	         */
-
-	    }, {
-	        key: "check",
-	        value: function check(day, start, end) {
-	            var _this = this;
-
-	            var totalConflicts = []; // Array to account for the overrides;
-
-	            var _loop = function _loop(x) {
-	                var currEle = _this.times[x];
-
-	                if (!day.some(function (v) {
-	                    return currEle.day.includes(v);
-	                })) return "continue";
-	                if (start <= currEle.end && end >= currEle.start) totalConflicts.push(currEle.course);
-	            };
-
-	            for (var x = 0; x < this.times.length; x++) {
-	                var _ret = _loop(x);
-
-	                if (_ret === "continue") continue;
-	            }
-
-	            return totalConflicts;
-	        }
-	    }]);
-
-	    return ConflictChecker;
-	}();
-
-	var suffix = ["", "- midterm", "- final"];
-	/**
-	 * @param {Integer} idx the nth appearence of that course
-	 * @return {String}
-	 */
-	function getSuffix(idx) {
-	    if (idx > suffix.length) return "";else return suffix[idx];
-	}
-
-	var hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
-	/**
-	 * @param {String} time in format 12:56pm
-	 */
-	function timeToMinute(time) {
-	    var result = time.match(hourMinuteRegex);
-	    if (result == null || result.length != 4) {
-	        throw new Error("Invalid time format " + time);
-	    }
-
-	    var totalMinutes = 0;
-	    var hour = Number(result[1]);
-	    totalMinutes += (hour == 12 ? 0 : hour) * 60;
-	    totalMinutes += Number(result[2]);
-	    totalMinutes += result[3] == "PM" ? 12 * 60 : 0;
-
-	    return totalMinutes;
-	}
-
-	var timeRegex = /(\w+) (.+) - (.+)/;
-	/**
-	 * @param {String} sched in format TWFSu 10:45pm - 11:12pm
-	 * @returns {String[]}
-	 */
-	function parseScheduleFormat(sched) {
-	    var parsedTimeResult = sched.match(timeRegex);
-
-	    if (parsedTimeResult == null || parsedTimeResult.length != 4) {
-	        throw new error("Invalid schedule format " + sched);
-	    }
-	    var dates = parseDate(parsedTimeResult[1]);
-	    var startTime = timeToMinute(parsedTimeResult[2]);
-	    var endTime = timeToMinute(parsedTimeResult[3]);
-
-	    return [dates, startTime, endTime];
-	}
-
-	var dateRegExp = /([A-Z][a-z]?)/g;
-
-	/**
-	 * Parses the days of the week format into seperate elements in a array eg MWFSSu
-	 * @param {String} date in format of MWFSu, etc
-	 * @returns {String[]} of the parsed dates
-	 */
-	function parseDate(date) {
-	    var rtn = date.match(dateRegExp);
-	    if (rtn == null) return [];else return rtn;
-	}
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.calculateColor = calculateColor;
-	var colors = exports.colors = ["darkRed", "red", "orange", "yellow", "lightGreen", "green"];
-
-	/**
-	 * @todo turn this into a calculation that involves statistics
-	 */
-	function calculateColor(val, max) {
-	    if (val <= 1.5) return colors[0];else if (val <= 2) return colors[1];else if (val <= 3) return colors[2];else if (val <= 3.8) return colors[3];else if (val <= 4.4) return colors[4];else return colors[5];
-	}
 
 /***/ }
 /******/ ]);
