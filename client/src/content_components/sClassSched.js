@@ -24,18 +24,14 @@ const displayed_Headings = [
         colored: false,
         key: "count"
     }
-    /*{
-        name: "Clarity",
-        desc: "How clear the professor's lectures are",
-        key: "clarity",
-        colored: true,
-        colored_inverted: false}*/
 ];
 
 const maxScore = 5;
 const cellStyle = {
     height: "50px"
 }
+
+const und = "javascript:void(0)";
 
 export default function s_ClassSched(){
     let mainTable = $("#ACE_STDNT_ENRL_SSV2\\$0"); // Main table with most of the content
@@ -75,7 +71,9 @@ function renderPage(mainTable, teachers){
         /** Hack because of know jquery bug */
         let ele = score.map(v => $(v).clone());
         $(e).closest("td").after(ele);
-        let personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+        let row = $(e).closest("tr").attr({"rmpquest-name": e.innerHTML.toLowerCase(), onmouseover:und, onclick:und, onmouseout:und});
+        let clonedChild = row.children().clone();
+        row.empty().append(clonedChild);
 
     });
 

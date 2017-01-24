@@ -7,26 +7,31 @@ const refresh = 1000;
 class searchPipeline{
     constructor(){
         this.steps = [];
+        this.pageFound = false;
     }
     
     use(func){
         this.steps.push(func);
     }
 
+    startSearch(){
+        this.pageFound = false;
+        this.intId = setInterval(this.search.bind(this), refresh);
+    }
+
     search(){
         for(let x = 0; x < this.steps.length; x ++){
             let result = this.steps[x].apply(this);
-            if(result === true)
-                return;
+            if(result === true){
+                clearInterval(this.intId);
+            }
         }
-        setTimeout(this.search.bind(this), refresh);
     }
 }
-/*
 
 const iframeID = "ptifrmtgtframe";
 let iframe = document.getElementById(iframeID);
-
+/*
 // If there is an iframe detected in the browser, redirect to the source of the iframe
 if(iframe != null){
     const src = iframe.src;
@@ -35,7 +40,7 @@ if(iframe != null){
     beginSearch();
 }
 */
-if(parent == top)
+if(iframe == null)
     beginSearch();
 
 function beginSearch(){
@@ -43,5 +48,5 @@ function beginSearch(){
     sPipeline.use(s_SearchClass);
     sPipeline.use(s_ClassSched);
 
-    sPipeline.search();
+    sPipeline.startSearch();
 }

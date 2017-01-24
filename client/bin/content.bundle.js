@@ -69,6 +69,7 @@
 	        _classCallCheck(this, searchPipeline);
 
 	        this.steps = [];
+	        this.pageFound = false;
 	    }
 
 	    _createClass(searchPipeline, [{
@@ -77,23 +78,29 @@
 	            this.steps.push(func);
 	        }
 	    }, {
+	        key: "startSearch",
+	        value: function startSearch() {
+	            this.pageFound = false;
+	            this.intId = setInterval(this.search.bind(this), refresh);
+	        }
+	    }, {
 	        key: "search",
 	        value: function search() {
 	            for (var x = 0; x < this.steps.length; x++) {
 	                var result = this.steps[x].apply(this);
-	                if (result === true) return;
+	                if (result === true) {
+	                    clearInterval(this.intId);
+	                }
 	            }
-	            setTimeout(this.search.bind(this), refresh);
 	        }
 	    }]);
 
 	    return searchPipeline;
 	}();
+
+	var iframeID = "ptifrmtgtframe";
+	var iframe = document.getElementById(iframeID);
 	/*
-
-	const iframeID = "ptifrmtgtframe";
-	let iframe = document.getElementById(iframeID);
-
 	// If there is an iframe detected in the browser, redirect to the source of the iframe
 	if(iframe != null){
 	    const src = iframe.src;
@@ -102,16 +109,14 @@
 	    beginSearch();
 	}
 	*/
-
-
-	if (parent == top) beginSearch();
+	if (iframe == null) beginSearch();
 
 	function beginSearch() {
 	    var sPipeline = new searchPipeline();
 	    sPipeline.use(_sSearchClass2.default);
 	    sPipeline.use(_sClassSched2.default);
 
-	    sPipeline.search();
+	    sPipeline.startSearch();
 	}
 
 /***/ },
@@ -2872,19 +2877,14 @@
 	    desc: "How many people have reviewed the professor",
 	    colored: false,
 	    key: "count"
-	}
-	/*{
-	    name: "Clarity",
-	    desc: "How clear the professor's lectures are",
-	    key: "clarity",
-	    colored: true,
-	    colored_inverted: false}*/
-	];
+	}];
 
 	var maxScore = 5;
 	var cellStyle = {
 	    height: "50px"
 	};
+
+	var und = "javascript:void(0)";
 
 	function s_ClassSched() {
 	    var mainTable = $("#ACE_STDNT_ENRL_SSV2\\$0"); // Main table with most of the content
@@ -2932,7 +2932,9 @@
 	            return $(v).clone();
 	        });
 	        $(e).closest("td").after(ele);
-	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+	        var row = $(e).closest("tr").attr({ "rmpquest-name": e.innerHTML.toLowerCase(), onmouseover: und, onclick: und, onmouseout: und });
+	        var clonedChild = row.children().clone();
+	        row.empty().append(clonedChild);
 	    });
 
 	    // Extract all the actual teachers
