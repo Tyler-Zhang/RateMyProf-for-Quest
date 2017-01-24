@@ -102,7 +102,7 @@ function renderPage(mainTable, teachers){
         d.forEach(v => {
             let name = v.queryName;
             let data = v.data;
-            let profRow = mainTable.find(`tr[rmpquest-name='${name}']`);
+            let profRow = mainTable.find(`tr[rmpquest-name="${name}"]`);
             
             let profName = profRow.find("span[id^='MTG_INSTR\\$']");
             if(data == null){    // Nothing was found o

@@ -287,7 +287,7 @@
 	        d.forEach(function (v) {
 	            var name = v.queryName;
 	            var data = v.data;
-	            var profRow = mainTable.find("tr[rmpquest-name='" + name + "']");
+	            var profRow = mainTable.find("tr[rmpquest-name=\"" + name + "\"]");
 
 	            var profName = profRow.find("span[id^='MTG_INSTR\\$']");
 	            if (data == null) {
@@ -2761,14 +2761,20 @@
 	 */
 	function timeToMinute(time) {
 	    var result = time.match(hourMinuteRegex);
-	    if (result == null || result.length != 4) {
+	    if (result == null || result.length < 3) {
 	        throw new Error("Invalid time format " + time);
 	    }
 
 	    var totalMinutes = 0;
 	    var hour = Number(result[1]);
+	    var minutes = Number(result[2]);
+
+	    if (result.length == 3) {
+	        return hour * 60 + minutes;
+	    }
+
 	    totalMinutes += (hour == 12 ? 0 : hour) * 60;
-	    totalMinutes += Number(result[2]);
+	    totalMinutes += minutes;
 	    totalMinutes += result[3] == "PM" ? 12 * 60 : 0;
 
 	    return totalMinutes;

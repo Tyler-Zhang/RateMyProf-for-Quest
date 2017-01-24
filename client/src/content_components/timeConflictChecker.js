@@ -58,19 +58,24 @@ const hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
  */
 export function timeToMinute(time){
     let result = time.match(hourMinuteRegex);
-    if(result == null || result.length != 4){
+    if(result == null || result.length < 3){
         throw new Error("Invalid time format " + time);
     }
 
     let totalMinutes = 0;
     let hour = Number(result[1]);
+    let minutes = Number(result[2]);
+
+    if(result.length == 3){
+        return hour * 60 + minutes;
+    }
+
     totalMinutes += ((hour == 12)? 0 : hour) * 60;
-    totalMinutes += Number(result[2]);
+    totalMinutes += minutes;
     totalMinutes += (result[3] == "PM")? 12 * 60 : 0;
 
     return totalMinutes;
 }
-
 
 
 const timeRegex = /(\w+) (.+) - (.+)/;
