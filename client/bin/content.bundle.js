@@ -62,7 +62,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var refresh = 1000;
+	var refresh = 500;
 
 	var searchPipeline = function () {
 	    function searchPipeline() {
@@ -2765,7 +2765,7 @@
 	    if (idx > suffix.length) return "";else return suffix[idx];
 	}
 
-	var hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
+	var hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)?/;
 	/**
 	 * @param {String} time in format 12:56pm or 23:12
 	 */

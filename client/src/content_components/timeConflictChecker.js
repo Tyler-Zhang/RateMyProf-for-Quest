@@ -52,7 +52,7 @@ export function getSuffix(idx){
 }
 
 
-const hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)/;
+const hourMinuteRegex = /(\d{1,2}):(\d{1,2})(AM|PM)?/;
 /**
  * @param {String} time in format 12:56pm or 23:12
  */
