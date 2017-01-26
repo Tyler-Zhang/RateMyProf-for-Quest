@@ -58,6 +58,12 @@ export class Scraper{
 
     private scrapeData(html:string): PersonObject{
         let $ = cheerio.load(html);
+
+         /** One of those weird professors where no information is found */
+        if($(".dosanddonts").length != 0){
+            return null;
+        }
+
         let scoreWrapper = $(".breakdown-wrapper");
         let quality = scoreWrapper.find("div.breakdown-container").find("div.grade").html().trim();
 

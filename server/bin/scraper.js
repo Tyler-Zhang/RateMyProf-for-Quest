@@ -22,7 +22,6 @@ class Scraper {
             else
                 return node_fetch_1.default(baseUrl + profUrl).then(r => r.text()).then(this.scrapeData);
         }).catch(e => {
-            console.log(name);
             console.log(e);
             return null;
         });
@@ -35,9 +34,8 @@ class Scraper {
         return node_fetch_1.default(url).then(d => d.text())
             .then(this.scrapeData)
             .catch(e => {
-                console.log(id);
-                console.log(e);
-                return null;
+            console.log(e);
+            return null;
         });
     }
     /**
@@ -47,13 +45,16 @@ class Scraper {
         return node_fetch_1.default(url).then(d => d.text())
             .then(this.scrapeData)
             .catch(e => {
-                console.log(url);
-                console.log(e);
-                return null;
+            console.log(e);
+            return null;
         });
     }
     scrapeData(html) {
         let $ = cheerio.load(html);
+        /** One of those weird professors where no information is found */
+        if ($(".dosanddonts").length != 0) {
+            return null;
+        }
         let scoreWrapper = $(".breakdown-wrapper");
         let quality = scoreWrapper.find("div.breakdown-container").find("div.grade").html().trim();
         let breakdownSection = scoreWrapper.find(".breakdown-section");
@@ -110,7 +111,7 @@ function extractIdFromUrl(url) {
     else
         return Number(result[1]);
 }
-let departmentRegex = /Professor in the (.+) department/i;
+let departmentRegex = /Professor in the ([A-Za-z ]+) department/i;
 /**
  * extracts the department of the professor from the description
  */
