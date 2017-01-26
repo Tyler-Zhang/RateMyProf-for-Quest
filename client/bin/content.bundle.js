@@ -199,19 +199,22 @@
 	    key: "quality",
 	    colored: true,
 	    colored_inverted: false,
-	    offset: 0
+	    offset: 0,
+	    decimal: true
 	}, {
 	    name: "Difficulty",
 	    desc: "How easy the professor is ",
 	    key: "easiness",
 	    colored: true,
 	    colored_inverted: true,
-	    offset: 1.5
+	    offset: 1.5,
+	    decimal: true
 	}, {
 	    name: "Reviews",
 	    desc: "How many people have reviewed the professor",
 	    colored: false,
-	    key: "count"
+	    key: "count",
+	    decimal: false
 	}
 	/*{
 	    name: "Clarity",
@@ -314,7 +317,7 @@
 	                href: "javascript:window.open('" + v.data.url + "', '_blank')" }));
 
 	            displayed_Headings.forEach(function (h) {
-	                var val = data[h.key];
+	                var val = h.decimal ? formatNum(data[h.key]) : data[h.key];
 	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
 
 	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
@@ -328,6 +331,10 @@
 	            });
 	        });
 	    });
+	}
+
+	function formatNum(val) {
+	    if (("" + val).indexOf(".") < 0) return val + ".0";else return val;
 	}
 
 	function suggestHandler(name) {
@@ -2864,19 +2871,22 @@
 	    key: "quality",
 	    colored: true,
 	    colored_inverted: false,
-	    offset: 0
+	    offset: 0,
+	    decimal: true
 	}, {
 	    name: "Difficulty",
 	    desc: "How easy the professor is ",
 	    key: "easiness",
 	    colored: true,
 	    colored_inverted: true,
-	    offset: 1.5
+	    offset: 1.5,
+	    decimal: true
 	}, {
 	    name: "Reviews",
 	    desc: "How many people have reviewed the professor",
 	    colored: false,
-	    key: "count"
+	    key: "count",
+	    decimal: false
 	}];
 
 	var maxScore = 5;
@@ -2961,7 +2971,7 @@
 	                href: "javascript:window.open('" + v.data.url + "', '_blank')" }));
 
 	            displayed_Headings.forEach(function (h) {
-	                var val = data[h.key];
+	                var val = h.decimal ? formatNum(data[h.key]) : data[h.key];
 	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
 
 	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
@@ -2975,6 +2985,10 @@
 	            });
 	        });
 	    });
+	}
+
+	function formatNum(val) {
+	    if (("" + val).indexOf(".") < 0) return val + ".0";else return val;
 	}
 
 	function suggestHandler(name) {
