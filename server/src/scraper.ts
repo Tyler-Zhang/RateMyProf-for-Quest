@@ -126,7 +126,7 @@ function extractIdFromUrl(url: string): number{
         return Number(result[1]);
 }
 
-let departmentRegex = /Professor in the ([A-Za-z ]+) department/i;
+let departmentRegex = /Professor in the (.+) department/i;
 /**
  * extracts the department of the professor from the description
  */
