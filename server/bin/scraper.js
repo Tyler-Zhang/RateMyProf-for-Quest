@@ -4,7 +4,7 @@ const node_fetch_1 = require("node-fetch");
 //const baseUrl = "https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+waterloo&query=ryan+trelford";
 const baseUrl = "https://www.ratemyprofessors.com";
 const queryUrl = "https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName";
-class scraper {
+class Scraper {
     constructor(school) {
         this.uniUrl = queryUrl + "&schoolName=" + encodeURIComponent(school);
     }
@@ -18,9 +18,13 @@ class scraper {
             let $ = cheerio.load(d);
             let profUrl = $("li.listing.PROFESSOR").find("a").attr("href");
             if (!profUrl)
-                throw new Error(name + " not found");
-            return node_fetch_1.default(baseUrl + profUrl).then(r => r.text());
-        }).then(this.scrapeData);
+                return null;
+            else
+                return node_fetch_1.default(baseUrl + profUrl).then(r => r.text()).then(this.scrapeData);
+        }).catch(e => {
+            console.log(e);
+            return null;
+        });
     }
     /**
      * Scrapes data based on the id of the professor
@@ -28,14 +32,22 @@ class scraper {
     getDataById(id) {
         let url = "https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + id;
         return node_fetch_1.default(url).then(d => d.text())
-            .then(this.scrapeData);
+            .then(this.scrapeData)
+            .catch(e => {
+            console.log(e);
+            return null;
+        });
     }
     /**
      * Scrapes data from a specific link
      */
     getDataByLink(url) {
         return node_fetch_1.default(url).then(d => d.text())
-            .then(this.scrapeData);
+            .then(this.scrapeData)
+            .catch(e => {
+            console.log(e);
+            return null;
+        });
     }
     scrapeData(html) {
         let $ = cheerio.load(html);
@@ -45,8 +57,10 @@ class scraper {
         let retake = breakdownSection.eq(0).children().html().trim();
         let difficulty = breakdownSection.eq(1).children().html().trim();
         let chilli = breakdownSection.eq(2).find("img").attr("src");
-        let amount = $(".table-toggle.rating-count.active").html().trim();
+        let ratingCount = $(".table-toggle.rating-count.active").html().trim();
         let nameWrapper = $(".profname").children();
+        let university = $(".school").html();
+        let department = $(".result-title").clone().children().remove().end().text().trim();
         let url = $("meta[property='og:url']").attr("content");
         let rtnObj = {
             fname: nameWrapper.eq(0).html().trim(),
@@ -54,17 +68,18 @@ class scraper {
             lname: nameWrapper.eq(2).html().trim(),
             quality: Number(quality),
             retake,
-            difficulty: Number(difficulty),
+            easiness: Number(difficulty),
             chilli,
-            amount: extractRatingAmount(amount),
+            count: extractRatingAmount(ratingCount),
             url,
-            id: extractIdFromUrl(url)
+            id: extractIdFromUrl(url),
+            university,
+            department: extractDepartment(department)
         };
         return rtnObj;
     }
 }
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = scraper;
+exports.Scraper = Scraper;
 let ratingRegex = /^\d+/;
 /**
  * extracts the amount of ratings from a string
@@ -72,8 +87,10 @@ let ratingRegex = /^\d+/;
  */
 function extractRatingAmount(rating) {
     let result = rating.match(ratingRegex);
-    if (result.length != 1)
-        throw new Error("Invalid Format");
+    if (!result || result.length != 1) {
+        console.log("malformed rating");
+        return null;
+    }
     else
         return Number(result[0]);
 }
@@ -83,12 +100,28 @@ let idRegex = /ShowRatings.jsp\?tid=(\d+)$/;
  */
 function extractIdFromUrl(url) {
     let result = url.match(idRegex);
-    if (result.length < 2)
-        throw new Error("malformed url");
+    if (!result || result.length < 2) {
+        console.log("malformed id");
+        return null;
+    }
     else
         return Number(result[1]);
 }
-let testScraper = new scraper("University of Waterloo");
-let start = Date.now();
+let departmentRegex = /Professor in the ([A-Za-z ]+) department/i;
+/**
+ * extracts the department of the professor from the description
+ */
+function extractDepartment(title) {
+    let result = title.match(departmentRegex);
+    if (!result || result.length < 2) {
+        console.log("malformed description");
+        return null;
+    }
+    else
+        return result[1];
+}
+/*
+let testScraper = new Scraper("University of Waterloo");
 testScraper.getDataByName("Ryan Trelford").then(v => console.log(v));
+*/ 
 //# sourceMappingURL=scraper.js.map

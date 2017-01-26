@@ -1,4 +1,3 @@
-
 import * as http from "http";
 import * as https from "https";
 import * as express from "express";
@@ -42,8 +41,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
 app.post("/getReviews", (req, res) => {
-    let school:String = req.body.school;
-    let names:String[] = req.body.names;
+    let school: string = req.body.school;
+    let names: string[] = req.body.names;
 
     if(school == null || school == ""){
         res.status(300).json({success: false, body: "Missing school field"});
@@ -100,12 +99,15 @@ app.get("*", (req, res) => {
     res.status(400).end("this is not a valid route");
 });
 
+if(config.debugMode){
+    http.createServer(app).listen(8080, () => log.info("server opened"));
+} else {
+    const options = {
+            key: fs.readFileSync(config.httpsKeyPath),
+            cert: fs.readFileSync(config.httpsCertPath)
+        }
+    https.createServer(options, app).listen(8080, ()=>{
+        log.info("The HTTPS server has been opened on port 443");
+    });
+}
 
- const options = {
-        key: fs.readFileSync(config.httpsKeyPath),
-        cert: fs.readFileSync(config.httpsCertPath)
-    }
-
-https.createServer(options, app).listen(8080, ()=>{
-    log.info("The HTTPS server has been opened on port 443");
-});
