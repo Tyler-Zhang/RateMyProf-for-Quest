@@ -22,6 +22,7 @@ class Scraper {
             else
                 return node_fetch_1.default(baseUrl + profUrl).then(r => r.text()).then(this.scrapeData);
         }).catch(e => {
+            console.log(name);
             console.log(e);
             return null;
         });
@@ -34,8 +35,9 @@ class Scraper {
         return node_fetch_1.default(url).then(d => d.text())
             .then(this.scrapeData)
             .catch(e => {
-            console.log(e);
-            return null;
+                console.log(id);
+                console.log(e);
+                return null;
         });
     }
     /**
@@ -45,8 +47,9 @@ class Scraper {
         return node_fetch_1.default(url).then(d => d.text())
             .then(this.scrapeData)
             .catch(e => {
-            console.log(e);
-            return null;
+                console.log(url);
+                console.log(e);
+                return null;
         });
     }
     scrapeData(html) {
@@ -107,7 +110,7 @@ function extractIdFromUrl(url) {
     else
         return Number(result[1]);
 }
-let departmentRegex = /Professor in the ([A-Za-z ]+) department/i;
+let departmentRegex = /Professor in the (.+) department/i;
 /**
  * extracts the department of the professor from the description
  */
