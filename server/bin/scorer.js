@@ -17,31 +17,37 @@ class ScoreResolver {
         });
     }
     getScore(university, names) {
+        names = names.map(v => v.toLowerCase());
         return this.uniTbl.findOne({ name: university })
             .then(r => {
             if (r == null)
                 return null;
-            let scraper = new scraper_1.Scraper(university);
-            return Promise.all(names.map(v => this.rmpGet(v, scraper, university)));
+            return this.rateTbl.find({ university, name: { $in: names } }).toArray().then((docs) => {
+                if (docs.length == names.length) {
+                    return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name }));
+                }
+                else {
+                    let scraper = new scraper_1.Scraper(university);
+                    let remainingNames = names.filter(item => {
+                        return !docs.some(found => found.name == item);
+                    });
+                    return Promise.all(remainingNames.map(v => this.rmpGet(v, scraper, university)))
+                        .then((remain) => {
+                        return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name })).concat(remain);
+                    });
+                }
+            });
         });
     }
     rmpGet(name, scraper, university) {
-        // This way the database won't have duplicates due to capitalization
-        name = name.toLowerCase();
-        return this.rateTbl.findOne({ university, name }).then(r => {
-            if (r != null) {
-                return r;
+        return scraper.getDataByName(name).then(d => {
+            if (d == null)
+                return null;
+            else {
+                let insertObj = Object.assign({}, d, { name });
+                this.rateTbl.insertOne(insertObj);
+                return d;
             }
-            else
-                return scraper.getDataByName(name).then(d => {
-                    if (d == null)
-                        return null;
-                    else {
-                        let insertObj = Object.assign({}, d, { name });
-                        this.rateTbl.update({ name, university }, insertObj, { upsert: true }).catch(e => this.log.error(e));
-                        return d;
-                    }
-                });
         }).catch(e => {
             this.log.error(e);
             return null;
