@@ -29,9 +29,21 @@ export default class ScoreResolver{
         .then(r => {    
             if(r == null)
                 return null;
-
-            let scraper = new Scraper(university);
-            return Promise.all(names.map(v => this.rmpGet(v, scraper, university)));
+            
+            return this.rateTbl.find({university, name: {$in: names}}).toArray().then((docs: DatabasePerson[]) => {
+                if(docs.length == names.length){
+                    return docs.map(v => Object.assign({}, {data: v}, {queryName: v.name}));
+                } else {
+                    let scraper = new Scraper(university);
+                    let remainingNames = names.filter(item => {
+                        return docs.some(found => found.name == item);
+                    });
+                    return Promise.all(remainingNames.map(v => this.rmpGet(v, scraper, university)))
+                    .then((remain:any) => {
+                        return docs.map(v => Object.assign({}, {data: v}, {queryName: v.name})).concat(remain);
+                    });
+                }
+            });
         });
     }
 
@@ -63,7 +75,11 @@ export default class ScoreResolver{
     }
 }
 
+interface DatabasePerson extends PersonObject{
+    name: string;
+}
+
 interface returnedQuery{
-    queryName: String;
+    queryName: string;
     data: PersonObject;
 }
