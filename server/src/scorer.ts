@@ -6,8 +6,9 @@ let mongoCli = mongodb.MongoClient;
 
 export default class ScoreResolver{
     
-    rateTbl:mongodb.Collection;
-    uniTbl:mongodb.Collection;
+    rateTbl: mongodb.Collection;
+    uniTbl: mongodb.Collection;
+    voidTbl: mongodb.Collection;
     log: bunyan;
     constructor(log:bunyan){
         this.log = log;
@@ -18,6 +19,7 @@ export default class ScoreResolver{
             else {
                 this.rateTbl = d.collection("ratings");
                 this.uniTbl = d.collection("university");
+                this.voidTbl = d.collection("void");
                 log.info("Connected to mongodb");
             }
         });
@@ -26,21 +28,21 @@ export default class ScoreResolver{
     getScore(university: string, names: string[]):Promise<returnedQuery[]|null>{
         names = names.map(v => v.toLowerCase());
         return this.uniTbl.findOne({name: university})
-        .then(r => {    
+        .then(r => {
             if(r == null)
                 return null;
-            
             return this.rateTbl.find({university, name: {$in: names}}).toArray().then((docs: DatabasePerson[]) => {
-                if(docs.length == names.length){                    
+                if(docs.length == names.length){
                     return docs.map(v => Object.assign({}, {data: v}, {queryName: v.name}));
                 } else {
-                    let scraper = new Scraper(university);
-                    let remainingNames = names.filter(item => {
-                        return !docs.some(found => found.name == item);
-                    });
-                    return Promise.all(remainingNames.map(v => this.rmpGet(v, scraper, university)))
-                    .then((remain:any) => {
-                        return docs.map(v => Object.assign({}, {data: v}, {queryName: v.name})).concat(remain);
+                    return this.voidTbl.find({university, name: {$in: names}}).toArray().then(voidDocs => {
+                        let totalDocs = voidDocs.concat(docs);
+                        let remainingNames = names.filter(item => !totalDocs.some(found => found.name == item));
+                        let formatedVoidDocs = voidDocs.map(v => {return {queryName: v.name, data: null}});
+                        return Promise.all(remainingNames.map(v => this.rmpGet(v, new Scraper(university), university)))
+                        .then((remain:any) => {
+                            return docs.map(v => Object.assign({}, {data: v}, {queryName: v.name})).concat(remain).concat(formatedVoidDocs);
+                        });
                     });
                 }
             });
@@ -48,8 +50,10 @@ export default class ScoreResolver{
     }
     rmpGet(name: string, scraper: Scraper, university: string):Promise<returnedQuery>{
         return scraper.getDataByName(name).then(d => {
-            if(d == null)
+            if(d == null){
+                this.voidTbl.insertOne({university, name});
                 return null;
+            }
             else{
                 let insertObj = Object.assign({}, d, {name});
                 this.rateTbl.insertOne(insertObj);

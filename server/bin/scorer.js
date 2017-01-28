@@ -12,6 +12,7 @@ class ScoreResolver {
             else {
                 this.rateTbl = d.collection("ratings");
                 this.uniTbl = d.collection("university");
+                this.voidTbl = d.collection("void");
                 log.info("Connected to mongodb");
             }
         });
@@ -27,13 +28,14 @@ class ScoreResolver {
                     return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name }));
                 }
                 else {
-                    let scraper = new scraper_1.Scraper(university);
-                    let remainingNames = names.filter(item => {
-                        return !docs.some(found => found.name == item);
-                    });
-                    return Promise.all(remainingNames.map(v => this.rmpGet(v, scraper, university)))
-                        .then((remain) => {
-                        return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name })).concat(remain);
+                    return this.voidTbl.find({ university, name: { $in: names } }).toArray().then(voidDocs => {
+                        let totalDocs = voidDocs.concat(docs);
+                        let remainingNames = names.filter(item => !totalDocs.some(found => found.name == item));
+                        let formatedVoidDocs = voidDocs.map(v => { return { queryName: v.name, data: null }; });
+                        return Promise.all(remainingNames.map(v => this.rmpGet(v, new scraper_1.Scraper(university), university)))
+                            .then((remain) => {
+                            return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name })).concat(remain).concat(formatedVoidDocs);
+                        });
                     });
                 }
             });
@@ -41,8 +43,10 @@ class ScoreResolver {
     }
     rmpGet(name, scraper, university) {
         return scraper.getDataByName(name).then(d => {
-            if (d == null)
+            if (d == null) {
+                this.voidTbl.insertOne({ university, name });
                 return null;
+            }
             else {
                 let insertObj = Object.assign({}, d, { name });
                 this.rateTbl.insertOne(insertObj);
