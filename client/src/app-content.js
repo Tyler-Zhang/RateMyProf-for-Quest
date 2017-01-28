@@ -2,7 +2,7 @@ import {getReviews} from "api";
 import s_SearchClass from "sSearchClass";
 import s_ClassSched from "sClassSched";
 
-const refresh = 500;
+const refresh = 100;
 
 class searchPipeline{
     constructor(){

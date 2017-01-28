@@ -41,6 +41,7 @@ const cellStyle = {
     height: "50px"
 }
 
+
 export default function s_SearchClass(){
     let mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
     // Get all teacher names on the page
@@ -74,7 +75,6 @@ function renderPage(mainTable, teachers){
 
     // Inserts the headings after the "instructors" heading
     insHeading.after(headings);
-    console.log(conflictChecker);
     teachers.each((i, e) => {
         /** Hack because of know jquery bug */
         let ele = score.map(v => $(v).clone());

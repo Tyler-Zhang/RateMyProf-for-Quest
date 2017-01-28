@@ -62,7 +62,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var refresh = 500;
+	var refresh = 100;
 
 	var searchPipeline = function () {
 	    function searchPipeline() {
@@ -121,9 +121,9 @@
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -134,14 +134,14 @@
 
 	    var obj = Object.assign({}, body, { school: "University of Waterloo" });
 
-	    var jsonBody = JSON.stringify(obj);
+	    var jsonBody = $.param(obj);
 	    //console.log(jsonBody);
 
 	    return fetch("https://tylerzhang.com:8080" + api, {
 	        method: "POST",
 	        body: jsonBody,
 	        headers: {
-	            "Content-Type": "application/json; charset=utf-8"
+	            "Content-Type": "application/x-www-form-urlencoded"
 	        }
 	    }, function (e) {
 	        return { success: false, body: e };
@@ -170,6 +170,7 @@
 	function suggestReview(name, university, link) {
 	    return base("/suggest", { name: name, university: university, link: link });
 	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
 /* 2 */
@@ -268,7 +269,6 @@
 
 
 	    insHeading.after(headings);
-	    console.log(conflictChecker);
 	    teachers.each(function (i, e) {
 	        /** Hack because of know jquery bug */
 	        var ele = score.map(function (v) {

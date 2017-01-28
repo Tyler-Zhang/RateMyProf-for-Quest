@@ -88,9 +88,9 @@
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -101,14 +101,14 @@
 
 	    var obj = Object.assign({}, body, { school: "University of Waterloo" });
 
-	    var jsonBody = JSON.stringify(obj);
+	    var jsonBody = $.param(obj);
 	    //console.log(jsonBody);
 
 	    return fetch("https://tylerzhang.com:8080" + api, {
 	        method: "POST",
 	        body: jsonBody,
 	        headers: {
-	            "Content-Type": "application/json; charset=utf-8"
+	            "Content-Type": "application/x-www-form-urlencoded"
 	        }
 	    }, function (e) {
 	        return { success: false, body: e };
@@ -137,6 +137,7 @@
 	function suggestReview(name, university, link) {
 	    return base("/suggest", { name: name, university: university, link: link });
 	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
 /* 2 */,

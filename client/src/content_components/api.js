@@ -2,14 +2,14 @@ function base(api, body){
 
     let obj = Object.assign({}, body, {school: "University of Waterloo"});
 
-    let jsonBody = JSON.stringify(obj);
+    let jsonBody = $.param(obj);
     //console.log(jsonBody);
 
     return fetch("https://tylerzhang.com:8080" + api, {
         method: "POST",
         body: jsonBody,
         headers: {
-            "Content-Type": "application/json; charset=utf-8"
+            "Content-Type": "application/x-www-form-urlencoded"
         }
     }, e => {return {success: false, body: e}})
     .then(d => {
