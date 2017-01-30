@@ -16,16 +16,17 @@ class searchPipeline{
 
     startSearch(){
         this.pageFound = false;
-        this.intId = setInterval(this.search.bind(this), refresh);
+        this.search();
     }
 
     search(){
         for(let x = 0; x < this.steps.length; x ++){
             let result = this.steps[x].apply(this);
             if(result === true){
-                clearInterval(this.intId);
+                return;
             }
         }
+        setTimeout(this.search.bind(this), refresh);
     }
 }
 

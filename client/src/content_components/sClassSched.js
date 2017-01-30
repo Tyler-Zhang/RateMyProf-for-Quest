@@ -42,7 +42,13 @@ export default function s_ClassSched(){
     if(teachers == null || teachers.length <= 0){
         return false; // Teachers weren't found using this method, move onto the next method
     }
-    renderPage(mainTable, teachers);
+
+    try{
+        renderPage(mainTable, teachers);
+    } catch(e) {
+        console.error(e);
+        return true;
+    }
     return true;
 }
 

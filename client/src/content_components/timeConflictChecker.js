@@ -68,11 +68,11 @@ export function timeToMinute(time){
 
     if(result.length == 3){ // If it is 24 hour format
         return (hour - 12) * 60 + minutes;
-    }
-
+    } else if(result.length == 4){
     totalMinutes += ((hour == 12)? 0 : hour) * 60;
     totalMinutes += minutes;
     totalMinutes += (result[3] == "PM")? 12 * 60 : 0;
+    }
 
     return totalMinutes;
 }
@@ -87,7 +87,7 @@ export function parseScheduleFormat(sched){
     let parsedTimeResult = sched.match(timeRegex);
 
     if(parsedTimeResult == null || parsedTimeResult.length != 4){
-        throw new error("Invalid schedule format " + sched);
+        throw new Error("Invalid schedule format " + sched);
     }
     let dates = parseDate(parsedTimeResult[1]);
     let startTime = timeToMinute(parsedTimeResult[2]);

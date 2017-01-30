@@ -50,7 +50,7 @@
 
 	var _api = __webpack_require__(1);
 
-	var _sSearchClass = __webpack_require__(2);
+	var _sSearchClass = __webpack_require__(5);
 
 	var _sSearchClass2 = _interopRequireDefault(_sSearchClass);
 
@@ -81,7 +81,7 @@
 	        key: "startSearch",
 	        value: function startSearch() {
 	            this.pageFound = false;
-	            this.intId = setInterval(this.search.bind(this), refresh);
+	            this.search();
 	        }
 	    }, {
 	        key: "search",
@@ -89,9 +89,10 @@
 	            for (var x = 0; x < this.steps.length; x++) {
 	                var result = this.steps[x].apply(this);
 	                if (result === true) {
-	                    clearInterval(this.intId);
+	                    return;
 	                }
 	            }
+	            setTimeout(this.search.bind(this), refresh);
 	        }
 	    }]);
 
@@ -170,212 +171,10 @@
 	function suggestReview(name, university, link) {
 	    return base("/suggest", { name: name, university: university, link: link });
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	exports.default = s_SearchClass;
-
-	var _timeConflictChecker = __webpack_require__(6);
-
-	var _api = __webpack_require__(1);
-
-	var _util = __webpack_require__(7);
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	var displayed_Headings = [{
-	    name: "Quality",
-	    desc: "How generally awesome the professor is",
-	    key: "quality",
-	    colored: true,
-	    colored_inverted: false,
-	    offset: 0,
-	    decimal: true
-	}, {
-	    name: "Difficulty",
-	    desc: "How easy the professor is ",
-	    key: "easiness",
-	    colored: true,
-	    colored_inverted: true,
-	    offset: 1.5,
-	    decimal: true
-	}, {
-	    name: "Reviews",
-	    desc: "How many people have reviewed the professor",
-	    colored: false,
-	    key: "count",
-	    decimal: false
-	}
-	/*{
-	    name: "Clarity",
-	    desc: "How clear the professor's lectures are",
-	    key: "clarity",
-	    colored: true,
-	    colored_inverted: false}*/
-	];
-
-	var maxScore = 5;
-	var cellStyle = {
-	    height: "50px"
-	};
-
-	function s_SearchClass() {
-	    var mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
-	    // Get all teacher names on the page
-	    var teachers = mainTable.find("span[id^='MTG_INSTR']");
-	    // If there are atleast one teacher not named staff
-	    if (teachers == null || teachers.length <= 0) {
-	        return false; // Teachers weren't found using this method, move onto the next method
-	    }
-	    renderPage(mainTable, teachers);
-	    return true;
-	}
-
-	function renderPage(mainTable, teachers) {
-
-	    var conflictChecker = parseCurrentClasses();
-
-	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
-	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
-	    var headingTemplate = insHeading.first(); // Get a heading template
-
-	    /** Generates the headings for each class depending on the displayed_Headings array */
-
-	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
-	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white" }).html("N/A");
-
-	        var currHeading = headingTemplate.clone();
-	        currHeading.attr("width", 60);
-	        currHeading.children().attr({ id: "", href: "javascript: void(0)", title: b.desc }).html(b.name);
-
-	        return [a[0].concat(currHeading), a[1].concat(currScore)];
-	    }, [[], []]),
-	        _displayed_Headings$r2 = _slicedToArray(_displayed_Headings$r, 2),
-	        headings = _displayed_Headings$r2[0],
-	        score = _displayed_Headings$r2[1];
-
-	    // Inserts the headings after the "instructors" heading
-
-
-	    insHeading.after(headings);
-	    teachers.each(function (i, e) {
-	        /** Hack because of know jquery bug */
-	        var ele = score.map(function (v) {
-	            return $(v).clone();
-	        });
-	        $(e).closest("td").after(ele);
-	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
-	        var timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
-	        var time = timeSpan.html();
-
-	        if (time === "TBA") // Don't know the time yet
-	            return;
-
-	        var overlap = conflictChecker.check.apply(conflictChecker, _toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(time))).map(function (v) {
-	            return $("<p>", { style: "color:red; font-size:10px;" }).html("Conflicts with " + v);
-	        });
-
-	        timeSpan.append(overlap);
-	    });
-
-	    // Extract all the actual teachers
-	    var teacherNames = teachers.toArray().map(function (v) {
-	        return v.innerHTML;
-	    }).filter(function (v, i, a) {
-	        if (v.toLowerCase() === "staff") return false;else return a.indexOf(v) == i;
-	    });
-
-	    (0, _api.getReviews)(teacherNames).then(function (d) {
-	        d.forEach(function (v) {
-	            var name = v.queryName;
-	            var data = v.data;
-	            var profRow = mainTable.find("tr[rmpquest-name=\"" + name + "\"]");
-
-	            var profName = profRow.find("span[id^='MTG_INSTR\\$']");
-	            if (data == null) {
-	                // Nothing was found o
-	                profName.wrap($("<a>", {
-	                    title: "Suggest a link for this teacher",
-	                    href: "javascript:void(0)" }).click(function () {
-	                    return suggestHandler(name);
-	                }));
-	                return;
-	            }
-	            profName.wrap($("<a>", {
-	                title: "Checkout the rate my prof page",
-	                href: "javascript:window.open('" + v.data.url + "', '_blank')" }));
-
-	            displayed_Headings.forEach(function (h) {
-	                var val = h.decimal ? formatNum(data[h.key]) : data[h.key];
-	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
-
-	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
-
-	                /**If we want to color the cell */
-	                if (h.colored) {
-	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
-	                    var color = (0, _util.calculateColor)(workingVal, maxScore);
-	                    cell.css("background-color", color);
-	                }
-	            });
-	        });
-	    });
-	}
-
-	function formatNum(val) {
-	    if (("" + val).indexOf(".") < 0) return val + ".0";else return val;
-	}
-
-	function suggestHandler(name) {
-	    chrome.runtime.sendMessage({
-	        name: name,
-	        message: "openSuggest"
-	    }, function (response) {
-	        if (response == false) console.error("Couldn't open the webpage");
-	    });
-	}
-
-	function parseCurrentClasses() {
-	    var conflictChecker = new _timeConflictChecker.ConflictChecker();
-
-	    var mainTable = $("#STDNT_ENRL_SSVW\\$scroll\\$0");
-	    var rows = mainTable.find("tr");
-
-	    var currSubject = void 0;
-	    var sameSubjectCount = void 0;
-
-	    for (var x = 0; x < rows.length; x++) {
-	        var curr = $(rows.get(x)).find("span");
-	        var course = curr[0].innerHTML;
-	        var times = curr[1].innerHTML;
-
-	        if (course != "&nbsp;") {
-	            currSubject = course;
-	            sameSubjectCount = 0;
-	        } else {
-	            sameSubjectCount++;
-	        }
-
-	        conflictChecker.add.apply(conflictChecker, [currSubject + (0, _timeConflictChecker.getSuffix)(sameSubjectCount)].concat(_toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(times))));
-	    }
-
-	    return conflictChecker;
-	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ },
-/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {"use strict";
@@ -2653,17 +2452,17 @@
 	      return this.on(b, a, c, d);
 	    }, undelegate: function undelegate(a, b, c) {
 	      return 1 === arguments.length ? this.off(a, "**") : this.off(b, a || "**", c);
-	    } }), r.parseJSON = JSON.parse, "function" == "function" && __webpack_require__(5) && !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    } }), r.parseJSON = JSON.parse, "function" == "function" && __webpack_require__(4) && !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 	    return r;
 	  }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));var Tb = a.jQuery,
 	      Ub = a.$;return r.noConflict = function (b) {
 	    return a.$ === r && (a.$ = Ub), b && a.jQuery === r && (a.jQuery = Tb), r;
 	  }, b || (a.jQuery = a.$ = r), r;
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -2679,12 +2478,226 @@
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	exports.default = s_SearchClass;
+
+	var _timeConflictChecker = __webpack_require__(6);
+
+	var _api = __webpack_require__(1);
+
+	var _util = __webpack_require__(7);
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var displayed_Headings = [{
+	    name: "Quality",
+	    desc: "How generally awesome the professor is",
+	    key: "quality",
+	    colored: true,
+	    colored_inverted: false,
+	    offset: 0,
+	    decimal: true
+	}, {
+	    name: "Difficulty",
+	    desc: "How easy the professor is ",
+	    key: "easiness",
+	    colored: true,
+	    colored_inverted: true,
+	    offset: 1.5,
+	    decimal: true
+	}, {
+	    name: "Reviews",
+	    desc: "How many people have reviewed the professor",
+	    colored: false,
+	    key: "count",
+	    decimal: false
+	}
+	/*{
+	    name: "Clarity",
+	    desc: "How clear the professor's lectures are",
+	    key: "clarity",
+	    colored: true,
+	    colored_inverted: false}*/
+	];
+
+	var maxScore = 5;
+	var cellStyle = {
+	    height: "50px"
+	};
+
+	function s_SearchClass(done) {
+	    var mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
+	    // Get all teacher names on the page
+	    var teachers = mainTable.find("span[id^='MTG_INSTR']");
+	    // If there are atleast one teacher not named staff
+	    if (teachers == null || teachers.length <= 0) {
+	        return false; // Teachers weren't found using this method, move onto the next method
+	    }
+	    try {
+	        renderPage(mainTable, teachers);
+	    } catch (e) {
+	        console.error(e);
+	    }
+	    return true;
+	}
+
+	function renderPage(mainTable, teachers) {
+
+	    var conflictChecker = parseCurrentClasses();
+
+	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
+	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
+	    var headingTemplate = insHeading.first(); // Get a heading template
+
+	    /** Generates the headings for each class depending on the displayed_Headings array */
+
+	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
+	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white" }).html("N/A");
+
+	        var currHeading = headingTemplate.clone();
+	        currHeading.attr("width", 60);
+	        currHeading.children().attr({ id: "", href: "javascript: void(0)", title: b.desc }).html(b.name);
+
+	        return [a[0].concat(currHeading), a[1].concat(currScore)];
+	    }, [[], []]),
+	        _displayed_Headings$r2 = _slicedToArray(_displayed_Headings$r, 2),
+	        headings = _displayed_Headings$r2[0],
+	        score = _displayed_Headings$r2[1];
+
+	    // Inserts the headings after the "instructors" heading
+
+
+	    insHeading.after(headings);
+	    teachers.each(function (i, e) {
+	        /** Hack because of know jquery bug */
+	        var ele = score.map(function (v) {
+	            return $(v).clone();
+	        });
+	        $(e).closest("td").after(ele);
+	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+	        var timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
+	        var time = timeSpan.html();
+
+	        if (time === "TBA") // Don't know the time yet
+	            return;
+
+	        if (conflictChecker == null) return;
+
+	        var overlap = conflictChecker.check.apply(conflictChecker, _toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(time))).map(function (v) {
+	            return $("<p>", { style: "color:red; font-size:10px;" }).html("Conflicts with " + v);
+	        });
+
+	        timeSpan.append(overlap);
+	    });
+
+	    // Extract all the actual teachers
+	    var teacherNames = teachers.toArray().map(function (v) {
+	        return v.innerHTML;
+	    }).filter(function (v, i, a) {
+	        if (v.toLowerCase() === "staff") return false;else return a.indexOf(v) == i;
+	    });
+
+	    (0, _api.getReviews)(teacherNames).then(function (d) {
+	        d.forEach(function (v) {
+	            var name = v.queryName;
+	            var data = v.data;
+	            var profRow = mainTable.find("tr[rmpquest-name=\"" + name + "\"]");
+
+	            var profName = profRow.find("span[id^='MTG_INSTR\\$']");
+	            if (data == null) {
+	                // Nothing was found o
+	                profName.wrap($("<a>", {
+	                    title: "Suggest a link for this teacher",
+	                    href: "javascript:void(0)" }).click(function () {
+	                    return suggestHandler(name);
+	                }));
+	                return;
+	            }
+	            profName.wrap($("<a>", {
+	                title: "Checkout the rate my prof page",
+	                href: "javascript:window.open('" + v.data.url + "', '_blank')" }));
+
+	            displayed_Headings.forEach(function (h) {
+	                var val = h.decimal ? formatNum(data[h.key]) : data[h.key];
+	                var cell = profRow.find("td[rmpquest-type='" + h.key + "']"); // Get rating cell
+
+	                cell.empty().append("<b>" + val + "</b>").attr(cellStyle); // put in the score, bolded
+
+	                /**If we want to color the cell */
+	                if (h.colored) {
+	                    var workingVal = (h.colored_inverted ? maxScore - val : val) + h.offset;
+	                    var color = (0, _util.calculateColor)(workingVal, maxScore);
+	                    cell.css("background-color", color);
+	                }
+	            });
+	        });
+	    });
+	}
+
+	function formatNum(val) {
+	    if (("" + val).indexOf(".") < 0) return val + ".0";else return val;
+	}
+
+	function suggestHandler(name) {
+	    chrome.runtime.sendMessage({
+	        name: name,
+	        message: "openSuggest"
+	    }, function (response) {
+	        if (response == false) console.error("Couldn't open the webpage");
+	    });
+	}
+
+	function parseCurrentClasses() {
+	    var conflictChecker = new _timeConflictChecker.ConflictChecker();
+
+	    var mainTable = $("#STDNT_ENRL_SSVW\\$scroll\\$0");
+	    var rows = mainTable.find("tr");
+
+	    var currSubject = void 0;
+	    var sameSubjectCount = void 0;
+
+	    for (var x = 0; x < rows.length; x++) {
+	        var curr = $(rows.get(x)).find("span");
+	        var course = curr[0].innerHTML;
+	        var times = curr[1].innerHTML;
+
+	        if (course != "&nbsp;") {
+	            currSubject = course;
+	            sameSubjectCount = 0;
+	        } else {
+	            sameSubjectCount++;
+	        }
+
+	        try {
+	            conflictChecker.add.apply(conflictChecker, [currSubject + (0, _timeConflictChecker.getSuffix)(sameSubjectCount)].concat(_toConsumableArray((0, _timeConflictChecker.parseScheduleFormat)(times))));
+	        } catch (e) {
+	            console.error(e);
+	            mainTable.after($("<p>", { style: "color: red; font-size: 10px" }).html("Waterloo Quest+ couldn't parse your schedule"));
+	            return null;
+	        }
+	    }
+
+	    return conflictChecker;
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
 /* 6 */
@@ -2789,11 +2802,11 @@
 	    if (result.length == 3) {
 	        // If it is 24 hour format
 	        return (hour - 12) * 60 + minutes;
+	    } else if (result.length == 4) {
+	        totalMinutes += (hour == 12 ? 0 : hour) * 60;
+	        totalMinutes += minutes;
+	        totalMinutes += result[3] == "PM" ? 12 * 60 : 0;
 	    }
-
-	    totalMinutes += (hour == 12 ? 0 : hour) * 60;
-	    totalMinutes += minutes;
-	    totalMinutes += result[3] == "PM" ? 12 * 60 : 0;
 
 	    return totalMinutes;
 	}
@@ -2807,7 +2820,7 @@
 	    var parsedTimeResult = sched.match(timeRegex);
 
 	    if (parsedTimeResult == null || parsedTimeResult.length != 4) {
-	        throw new error("Invalid schedule format " + sched);
+	        throw new Error("Invalid schedule format " + sched);
 	    }
 	    var dates = parseDate(parsedTimeResult[1]);
 	    var startTime = timeToMinute(parsedTimeResult[2]);
@@ -2902,7 +2915,13 @@
 	    if (teachers == null || teachers.length <= 0) {
 	        return false; // Teachers weren't found using this method, move onto the next method
 	    }
-	    renderPage(mainTable, teachers);
+
+	    try {
+	        renderPage(mainTable, teachers);
+	    } catch (e) {
+	        console.error(e);
+	        return true;
+	    }
 	    return true;
 	}
 
@@ -2999,7 +3018,7 @@
 	        if (response == false) console.error("Couldn't open the webpage");
 	    });
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }
 /******/ ]);

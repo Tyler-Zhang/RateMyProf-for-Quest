@@ -42,7 +42,7 @@ const cellStyle = {
 }
 
 
-export default function s_SearchClass(){
+export default function s_SearchClass(done){
     let mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
     // Get all teacher names on the page
     let teachers = mainTable.find("span[id^='MTG_INSTR']");
@@ -50,7 +50,11 @@ export default function s_SearchClass(){
     if(teachers == null || teachers.length <= 0){
         return false; // Teachers weren't found using this method, move onto the next method
     }
-    renderPage(mainTable, teachers);
+    try{
+        renderPage(mainTable, teachers);
+    } catch(e) {
+        console.error(e);
+    }
     return true;
 }
 
@@ -84,6 +88,9 @@ function renderPage(mainTable, teachers){
         let time = timeSpan.html();
 
         if(time === "TBA")  // Don't know the time yet
+            return;
+
+        if(conflictChecker == null)
             return;
 
         let overlap = conflictChecker.check(...parseScheduleFormat(time)).map(v => 
@@ -174,7 +181,13 @@ function parseCurrentClasses(){
             sameSubjectCount ++;
         }
 
-        conflictChecker.add(currSubject + getSuffix(sameSubjectCount), ...parseScheduleFormat(times));
+        try{
+            conflictChecker.add(currSubject + getSuffix(sameSubjectCount), ...parseScheduleFormat(times));
+        }catch(e){
+            console.error(e);
+            mainTable.after($("<p>", { style:"color: red; font-size: 10px"}).html("Waterloo Quest+ couldn't parse your schedule"));
+            return null;
+        }
     }
 
     return conflictChecker;
