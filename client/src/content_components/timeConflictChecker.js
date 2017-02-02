@@ -1,3 +1,5 @@
+const strictMode = false;
+
 
 export class ConflictChecker{
     constructor(){
@@ -87,7 +89,10 @@ export function parseScheduleFormat(sched){
     let parsedTimeResult = sched.match(timeRegex);
 
     if(parsedTimeResult == null || parsedTimeResult.length != 4){
-        throw new Error("Invalid schedule format " + sched);
+        if(strictMode)
+            throw new Error("Invalid schedule format " + sched);
+        else
+            return [[], 0, 0];
     }
     let dates = parseDate(parsedTimeResult[1]);
     let startTime = timeToMinute(parsedTimeResult[2]);
