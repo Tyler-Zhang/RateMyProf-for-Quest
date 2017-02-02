@@ -1,6 +1,6 @@
 "use strict";
-const cheerio = require('cheerio');
-const node_fetch_1 = require('node-fetch');
+const cheerio = require("cheerio");
+const node_fetch_1 = require("node-fetch");
 //const baseUrl = "https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+waterloo&query=ryan+trelford";
 const baseUrl = "https://www.ratemyprofessors.com";
 const queryUrl = "https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName";

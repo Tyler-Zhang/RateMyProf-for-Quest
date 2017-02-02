@@ -19,8 +19,7 @@ class ScoreResolver {
     }
     getScore(university, names) {
         names = names.map(v => v.toLowerCase());
-        return this.uniTbl.findOne({ name: university })
-            .then(r => {
+        return this.uniTbl.findOne({ name: university }).then(r => {
             if (r == null)
                 return null;
             return this.rateTbl.find({ university, name: { $in: names } }).toArray().then((docs) => {
@@ -31,6 +30,9 @@ class ScoreResolver {
                     return this.voidTbl.find({ university, name: { $in: names } }).toArray().then(voidDocs => {
                         let totalDocs = voidDocs.concat(docs);
                         let remainingNames = names.filter(item => !totalDocs.some(found => found.name == item));
+                        if (remainingNames.length >= config.scrapeLimit) {
+                            throw new Error("Trying to query way too many people");
+                        }
                         let formatedVoidDocs = voidDocs.map(v => { return { queryName: v.name, data: null }; });
                         return Promise.all(remainingNames.map(v => this.rmpGet(v, new scraper_1.Scraper(university), university)))
                             .then((remain) => {

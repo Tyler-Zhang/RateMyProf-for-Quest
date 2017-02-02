@@ -113,6 +113,7 @@ function extractRatingAmount(rating:string): number{
         return Number(result[0]);
 }
 
+
 let idRegex = /ShowRatings.jsp\?tid=(\d+)$/;
 /**
  * extracts the id number of the professor from the url on the page
@@ -125,6 +126,7 @@ function extractIdFromUrl(url: string): number{
     }else
         return Number(result[1]);
 }
+
 
 let departmentRegex = /Professor in the (.+) department/i;
 /**

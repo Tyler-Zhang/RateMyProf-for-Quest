@@ -1,3 +1,6 @@
+/**
+ * Api calls use x-www-form-urlencoded calls to get rid of pre-fetch for better performance
+ */
 function base(api, body){
 
     let obj = Object.assign({}, body, {school: "University of Waterloo"});

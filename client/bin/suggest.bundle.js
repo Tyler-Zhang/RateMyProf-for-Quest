@@ -97,6 +97,9 @@
 	});
 	exports.getReviews = getReviews;
 	exports.suggestReview = suggestReview;
+	/**
+	 * Api calls use x-www-form-urlencoded calls to get rid of pre-fetch for better performance
+	 */
 	function base(api, body) {
 
 	    var obj = Object.assign({}, body, { school: "University of Waterloo" });

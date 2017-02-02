@@ -83,7 +83,7 @@ function renderPage(mainTable, teachers){
         /** Hack because of know jquery bug */
         let ele = score.map(v => $(v).clone());
         $(e).closest("td").after(ele);
-        let personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+        let personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.replace(/[\u0250-\ue007]/g, '').toLowerCase());
         let timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
         let time = timeSpan.html();
 
@@ -101,11 +101,13 @@ function renderPage(mainTable, teachers){
     });
 
     // Extract all the actual teachers
-    let teacherNames = teachers.toArray().map(v => v.innerHTML).filter((v, i, a) => {
-        if(v.toLowerCase() === "staff")
+    let teacherNames = teachers.toArray().map(v => v.innerHTML.replace(/\r\n/g, '').toLowerCase()).filter((v, i, a) => {
+        if(v.toLowerCase() === "staff") // Staff is just a generic TBD, don't parse
+            return false;
+        else if(v.indexOf("<br>") > 0)  // If they have a break, that usuall means there are more than 1 person which can't be parsed
             return false;
         else
-            return a.indexOf(v) == i;
+            return a.indexOf(v) == i;   // Remove duplicates
     });
     
     getReviews(teacherNames).then(d => {

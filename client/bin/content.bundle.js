@@ -131,6 +131,9 @@
 	});
 	exports.getReviews = getReviews;
 	exports.suggestReview = suggestReview;
+	/**
+	 * Api calls use x-www-form-urlencoded calls to get rid of pre-fetch for better performance
+	 */
 	function base(api, body) {
 
 	    var obj = Object.assign({}, body, { school: "University of Waterloo" });
@@ -2592,7 +2595,7 @@
 	            return $(v).clone();
 	        });
 	        $(e).closest("td").after(ele);
-	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.toLowerCase());
+	        var personRow = $(e).closest("tr").attr("rmpquest-name", e.innerHTML.replace(/[\u0250-\ue007]/g, '').toLowerCase());
 	        var timeSpan = personRow.find("span[id^='MTG_DAYTIME']");
 	        var time = timeSpan.html();
 
@@ -2610,9 +2613,11 @@
 
 	    // Extract all the actual teachers
 	    var teacherNames = teachers.toArray().map(function (v) {
-	        return v.innerHTML;
+	        return v.innerHTML.replace(/\r\n/g, '').toLowerCase();
 	    }).filter(function (v, i, a) {
-	        if (v.toLowerCase() === "staff") return false;else return a.indexOf(v) == i;
+	        if (v.toLowerCase() === "staff") // Staff is just a generic TBD, don't parse
+	            return false;else if (v.indexOf("<br>") > 0) // If they have a break, that usuall means there are more than 1 person which can't be parsed
+	            return false;else return a.indexOf(v) == i; // Remove duplicates
 	    });
 
 	    (0, _api.getReviews)(teacherNames).then(function (d) {
