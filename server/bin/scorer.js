@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb = require("mongodb");
 const scraper_1 = require("./scraper");
 const config = require("../config.js");
@@ -65,6 +66,5 @@ class ScoreResolver {
         });
     }
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ScoreResolver;
 //# sourceMappingURL=scorer.js.map
