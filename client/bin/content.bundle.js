@@ -2723,6 +2723,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var strictMode = false;
+
 	var ConflictChecker = exports.ConflictChecker = function () {
 	    function ConflictChecker() {
 	        _classCallCheck(this, ConflictChecker);
@@ -2825,7 +2827,7 @@
 	    var parsedTimeResult = sched.match(timeRegex);
 
 	    if (parsedTimeResult == null || parsedTimeResult.length != 4) {
-	        throw new Error("Invalid schedule format " + sched);
+	        if (strictMode) throw new Error("Invalid schedule format " + sched);else return [[], 0, 0];
 	    }
 	    var dates = parseDate(parsedTimeResult[1]);
 	    var startTime = timeToMinute(parsedTimeResult[2]);
