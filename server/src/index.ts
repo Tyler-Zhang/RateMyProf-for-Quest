@@ -99,15 +99,8 @@ app.get("*", (req, res) => {
     res.status(400).end("this is not a valid route");
 });
 
-if(config.debugMode){
-    http.createServer(app).listen(config.HTTP_PORT, () => log.info("server opened"));
-} else {
-    const options = {
-            key: fs.readFileSync(config.httpsKeyPath),
-            cert: fs.readFileSync(config.httpsCertPath)
-        }
-    https.createServer(options, app).listen(config.HTTPS_PORT, ()=>{
-        log.info("The HTTPS server has been opened on port %d", config.HTTPS_PORT);
-    });
-}
+http.createServer(app).listen(config.HTTP_PORT, ()=>{
+        log.info("The HTTP server has been opened on port %d", config.HTTPS_PORT);
+});
+
 

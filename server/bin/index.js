@@ -1,12 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const http = require("http");
-const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 const bunyan = require("bunyan");
 const mongodb = require("mongodb");
-const fs = require("fs");
 const scorer_1 = require("./scorer");
 const compression = require("compression");
 const config = require("../config.js");
@@ -83,16 +81,7 @@ app.post("*", (req, res) => {
 app.get("*", (req, res) => {
     res.status(400).end("this is not a valid route");
 });
-if (config.debugMode) {
-    http.createServer(app).listen(config.HTTP_PORT, () => log.info("server opened"));
-}
-else {
-    const options = {
-        key: fs.readFileSync(config.httpsKeyPath),
-        cert: fs.readFileSync(config.httpsCertPath)
-    };
-    https.createServer(options, app).listen(config.HTTPS_PORT, () => {
-        log.info("The HTTPS server has been opened on port %d", config.HTTPS_PORT);
-    });
-}
+http.createServer(app).listen(config.HTTP_PORT, () => {
+    log.info("The HTTP server has been opened on port %d", config.HTTPS_PORT);
+});
 //# sourceMappingURL=index.js.map
