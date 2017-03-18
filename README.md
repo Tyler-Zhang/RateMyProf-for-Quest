@@ -1,4 +1,4 @@
-# RateMyProf for Quest
+# Waterloo Quest +
 
 A chrome extension that auto-_magically_ injects rate my professor scores into Waterloo's quest platform
 
