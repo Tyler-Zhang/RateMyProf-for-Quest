@@ -21,8 +21,16 @@ mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) =>
     if (err)
         log.error(err);
     else {
-        suggestTbl = d.collection("suggest");
-        log.info("Connected to mongodb");
+        d.authenticate(config.dbAuth.username, config.dbAuth.password, (e, r) => {
+            if (e) {
+                log.error(e);
+                throw e;
+            }
+            else {
+                suggestTbl = d.collection("suggest");
+                log.info("Connected to mongodb");
+            }
+        });
     }
 });
 let Scorer = new scorer_1.default(log);
