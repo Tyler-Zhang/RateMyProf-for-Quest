@@ -5,18 +5,11 @@ const scraper_1 = require("./scraper");
 const config = require("../config.js");
 let mongoCli = mongodb.MongoClient;
 class ScoreResolver {
-    constructor(log) {
+    constructor(log, db) {
         this.log = log;
-        mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
-            if (err)
-                log.error(err);
-            else {
-                this.rateTbl = d.collection("ratings");
-                this.uniTbl = d.collection("university");
-                this.voidTbl = d.collection("void");
-                log.info("Connected to mongodb");
-            }
-        });
+        this.rateTbl = db.collection("ratings");
+        this.uniTbl = db.collection("university");
+        this.voidTbl = db.collection("void");
     }
     getScore(university, names) {
         names = names.map(v => v.toLowerCase());

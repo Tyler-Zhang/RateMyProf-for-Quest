@@ -19,7 +19,10 @@ const log = bunyan.createLogger({
 });
 let mongoCli = mongodb.MongoClient;
 let suggestTbl: mongodb.Collection;
+let Scorer: ScoreResolver;
+
 mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
+  log.info("Connected to mongodb");
   if (err)
     log.error(err);
   else {
@@ -28,14 +31,13 @@ mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) =>
         log.error(e);
         throw e;
       } else {
+        log.info("Authenticated to mongodb");
         suggestTbl = d.collection("suggest");
-        log.info("Connected to mongodb");
+        Scorer = new ScoreResolver(log, d);
       }
     });
   }
 });
-
-let Scorer = new ScoreResolver(log);
 
 let app = express();
 app.use(function (req, res, next) {

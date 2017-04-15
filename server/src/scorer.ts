@@ -10,19 +10,12 @@ export default class ScoreResolver {
   uniTbl: mongodb.Collection;
   voidTbl: mongodb.Collection;
   log: bunyan;
-  constructor(log: bunyan) {
+  constructor(log: bunyan, db: mongodb.Db) {
     this.log = log;
 
-    mongoCli.connect(`mongodb://${config.dbAuth.url}:27017/RMPforQuest`, (err, d) => {
-      if (err)
-        log.error(err);
-      else {
-        this.rateTbl = d.collection("ratings");
-        this.uniTbl = d.collection("university");
-        this.voidTbl = d.collection("void");
-        log.info("Connected to mongodb");
-      }
-    });
+    this.rateTbl = db.collection("ratings");
+    this.uniTbl = db.collection("university");
+    this.voidTbl = db.collection("void");
   }
 
   getScore(university: string, names: string[]): Promise<returnedQuery[] | null> {
