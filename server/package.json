@@ -11,8 +11,7 @@
     "express": "^4.14.0",
     "mongodb": "^2.2.21",
     "node-fetch": "^1.6.3",
-    "nodemon": "^1.11.0",
-    "rmp-api": "^1.2.5"
+    "nodemon": "^1.11.0"
   },
   "scripts": {
     "server": "nodemon bin/index.js | bunyan"
