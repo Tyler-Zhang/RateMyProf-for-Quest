@@ -62,8 +62,6 @@ function renderPage(mainTable, teachers){
     
     let conflictChecker = parseCurrentClasses();
 
-    console.log('Page found');
-
     mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
     let insHeading = mainTable.find("th[abbr='Instructor']");    // Find all heading called "instructor" so we can append more headings after them
     let headingTemplate = insHeading.first();       // Get a heading template
