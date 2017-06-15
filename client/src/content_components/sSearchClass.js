@@ -43,7 +43,7 @@ const cellStyle = {
 
 
 export default function s_SearchClass(done){
-    let mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
+    let mainTable = $("table[id^='ACE_DERIVED_CLSRCH']"); // Main table with most of the content
     // Get all teacher names on the page
     let teachers = mainTable.find("span[id^='MTG_INSTR']");
     // If there are atleast one teacher not named staff
@@ -62,13 +62,15 @@ function renderPage(mainTable, teachers){
     
     let conflictChecker = parseCurrentClasses();
 
+    console.log('Page found');
+
     mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
     let insHeading = mainTable.find("th[abbr='Instructor']");    // Find all heading called "instructor" so we can append more headings after them
     let headingTemplate = insHeading.first();       // Get a heading template
 
     /** Generates the headings for each class depending on the displayed_Headings array */
     let [headings, score] = displayed_Headings.reduce((a, b) => {
-        let currScore = $("<td>").attr({"rmpquest-type": b.key, style:"background-color:white"}).html("N/A");
+        let currScore = $("<td>").attr({"rmpquest-type": b.key, style:"background-color:white; outline: 1px solid black;"}).html("--");
 
         let currHeading = headingTemplate.clone();
         currHeading.attr("width", 60);

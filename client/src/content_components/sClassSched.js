@@ -63,7 +63,7 @@ function renderPage(mainTable, teachers){
 
     /** Generates the headings for each class depending on the displayed_Headings array */
     let [headings, score] = displayed_Headings.reduce((a, b) => {
-        let currScore = $("<td>").attr({"rmpquest-type": b.key, style:"background-color:white; border-style:solid; border-width:1"}).html("N/A");
+        let currScore = $("<td>").attr({"rmpquest-type": b.key, style:"background-color:white; border-style:solid; border-width:1"}).html("--");
 
         let currHeading = headingTemplate.clone();
         currHeading.attr("width", 60);

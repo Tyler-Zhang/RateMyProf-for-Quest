@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -120,9 +120,9 @@
 	    sPipeline.startSearch();
 	}
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
@@ -141,7 +141,7 @@
 	    var jsonBody = $.param(obj);
 	    //console.log(jsonBody);
 
-	    return fetch("https://tylerzhang.com:8080" + api, {
+	    return fetch("https://rmpfq.tylerzhang.com" + api, {
 	        method: "POST",
 	        body: jsonBody,
 	        headers: {
@@ -176,9 +176,9 @@
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {"use strict";
 
@@ -2464,9 +2464,9 @@
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -2480,17 +2480,17 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
@@ -2532,14 +2532,13 @@
 	    colored: false,
 	    key: "count",
 	    decimal: false
-	}
-	/*{
-	    name: "Clarity",
-	    desc: "How clear the professor's lectures are",
-	    key: "clarity",
-	    colored: true,
-	    colored_inverted: false}*/
-	];
+	    /*{
+	        name: "Clarity",
+	        desc: "How clear the professor's lectures are",
+	        key: "clarity",
+	        colored: true,
+	        colored_inverted: false}*/
+	}];
 
 	var maxScore = 5;
 	var cellStyle = {
@@ -2547,7 +2546,7 @@
 	};
 
 	function s_SearchClass(done) {
-	    var mainTable = $("#\\$ICField102\\$scroll\\$0"); // Main table with most of the content
+	    var mainTable = $("table[id^='ACE_DERIVED_CLSRCH']"); // Main table with most of the content
 	    // Get all teacher names on the page
 	    var teachers = mainTable.find("span[id^='MTG_INSTR']");
 	    // If there are atleast one teacher not named staff
@@ -2566,6 +2565,8 @@
 
 	    var conflictChecker = parseCurrentClasses();
 
+	    console.log('Page found');
+
 	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
 	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
 	    var headingTemplate = insHeading.first(); // Get a heading template
@@ -2573,7 +2574,7 @@
 	    /** Generates the headings for each class depending on the displayed_Headings array */
 
 	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
-	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white" }).html("N/A");
+	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white; outline: 1px solid black;" }).html("--");
 
 	        var currHeading = headingTemplate.clone();
 	        currHeading.attr("width", 60);
@@ -2704,9 +2705,9 @@
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -2848,9 +2849,9 @@
 	    if (rtn == null) return [];else return rtn;
 	}
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -2867,9 +2868,9 @@
 	    if (val <= 1.5) return colors[0];else if (val <= 2) return colors[1];else if (val <= 3) return colors[2];else if (val <= 3.8) return colors[3];else if (val <= 4.4) return colors[4];else return colors[5];
 	}
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
@@ -2944,7 +2945,7 @@
 	    /** Generates the headings for each class depending on the displayed_Headings array */
 
 	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
-	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white; border-style:solid; border-width:1" }).html("N/A");
+	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white; border-style:solid; border-width:1" }).html("--");
 
 	        var currHeading = headingTemplate.clone();
 	        currHeading.attr("width", 60);
@@ -3027,5 +3028,5 @@
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
-/***/ }
+/***/ })
 /******/ ]);

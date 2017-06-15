@@ -8,7 +8,7 @@ function base(api, body){
     let jsonBody = $.param(obj);
     //console.log(jsonBody);
 
-    return fetch("https://tylerzhang.com:8080" + api, {
+    return fetch("https://rmpfq.tylerzhang.com" + api, {
         method: "POST",
         body: jsonBody,
         headers: {
