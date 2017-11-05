@@ -39,3 +39,5 @@ jspm_packages
 config.js
 
 built.zip
+.env
+server/build

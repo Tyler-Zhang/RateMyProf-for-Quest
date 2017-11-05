@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "compression": "registry:dt/compression#0.0.0+20160725212620",
-    "debug": "registry:npm/debug#2.0.0+20160723033700"
-  }
-}

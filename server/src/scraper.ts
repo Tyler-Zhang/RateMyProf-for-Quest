@@ -15,7 +15,7 @@ export class Scraper {
   /**
    * Scrapes data by the name of the professor
    */
-  getDataByName(name: string): Promise<PersonObject> {
+  getDataByName(name: string): Promise<PersonObject | null> {
     let webUrl = this.uniUrl + "&query=" + encodeURIComponent(name);
     return fetch(webUrl).then(d => d.text())
       .then(d => {
@@ -34,7 +34,7 @@ export class Scraper {
   /**
    * Scrapes data based on the id of the professor
    */
-  getDataById(id: number): Promise<PersonObject> {
+  getDataById(id: number): Promise<PersonObject | null> {
     let url = "https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + id;
     return fetch(url).then(d => d.text())
       .then(this.scrapeData)
@@ -47,7 +47,7 @@ export class Scraper {
   /**
    * Scrapes data from a specific link
    */
-  getDataByLink(url: string): Promise<PersonObject> {
+  getDataByLink(url: string): Promise<PersonObject | null> {
     return fetch(url).then(d => d.text())
       .then(this.scrapeData)
       .catch(e => {
@@ -56,7 +56,7 @@ export class Scraper {
       })
   }
 
-  private scrapeData(html: string): PersonObject {
+  private scrapeData(html: string): PersonObject | null {
     let $ = cheerio.load(html);
 
     /** One of those weird professors where no information is found */
@@ -65,13 +65,13 @@ export class Scraper {
     }
 
     let scoreWrapper = $(".breakdown-wrapper");
-    let quality = scoreWrapper.find("div.breakdown-container").find("div.grade").html().trim();
+    let quality = (scoreWrapper.find("div.breakdown-container").find("div.grade").html() as string).trim();
 
     let breakdownSection = scoreWrapper.find(".breakdown-section");
-    let retake = breakdownSection.eq(0).children().html().trim();
-    let difficulty = breakdownSection.eq(1).children().html().trim();
+    let retake = (breakdownSection.eq(0).children().html() as string).trim();
+    let difficulty = (breakdownSection.eq(1).children().html() as string).trim();
     let chilli = breakdownSection.eq(2).find("img").attr("src");
-    let ratingCount = $(".table-toggle.rating-count.active").html().trim();
+    let ratingCount = ($(".table-toggle.rating-count.active").html() as string).trim();
     let nameWrapper = $(".profname").children();
     let university = $(".school").html();
 
@@ -80,9 +80,9 @@ export class Scraper {
     let url = $("meta[property='og:url']").attr("content");
 
     let rtnObj: PersonObject = {
-      fname: nameWrapper.eq(0).html().trim(),
-      mname: nameWrapper.eq(1).html().trim(),
-      lname: nameWrapper.eq(2).html().trim(),
+      fname: (nameWrapper.eq(0).html() as string).trim(),
+      mname: (nameWrapper.eq(1).html() as string).trim(),
+      lname: (nameWrapper.eq(2).html() as string).trim(),
       quality: Number(quality),
       retake,
       easiness: Number(difficulty),
@@ -104,7 +104,7 @@ let ratingRegex = /^\d+/;
  * extracts the amount of ratings from a string
  * eg. extracts 18 from "18 Student Ratings"
  */
-function extractRatingAmount(rating: string): number {
+function extractRatingAmount(rating: string): number | null {
   let result = rating.match(ratingRegex);
   if (!result || result.length != 1) {
     console.log("malformed rating");
@@ -118,7 +118,7 @@ let idRegex = /ShowRatings.jsp\?tid=(\d+)$/;
 /**
  * extracts the id number of the professor from the url on the page
  */
-function extractIdFromUrl(url: string): number {
+function extractIdFromUrl(url: string): number | null {
   let result = url.match(idRegex);
   if (!result || result.length < 2) {
     console.log("malformed id");
@@ -132,7 +132,7 @@ let departmentRegex = /Professor in the (.+) department/i;
 /**
  * extracts the department of the professor from the description
  */
-function extractDepartment(title: string): string {
+function extractDepartment(title: string): string | null {
   let result = title.match(departmentRegex);
   if (!result || result.length < 2) {
     console.log("malformed description");
@@ -146,18 +146,18 @@ function extractDepartment(title: string): string {
  * The data object returned by the scraper
  */
 export interface PersonObject {
-  quality: number;
-  retake: string;
-  easiness: number;
+  quality: number | null;
+  retake: string | null;
+  easiness: number | null;
   chilli: string,
-  count: number;
-  fname: string;
-  lname: string;
-  mname: string;
-  id: number;
-  url: string;
-  university: string;
-  department: string;
+  count: number | null;
+  fname: string | null;
+  lname: string | null;
+  mname: string | null;
+  id: number | null;
+  url: string | null;
+  university: string | null;
+  department: string | null;
 }
 /*
 let testScraper = new Scraper("University of Waterloo");

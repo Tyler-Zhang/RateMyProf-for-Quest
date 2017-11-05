@@ -1,7 +1,6 @@
 import * as mongodb from "mongodb";
 import * as bunyan from "bunyan";
 import { Scraper, PersonObject } from "./scraper";
-const config = require("../config.js");
 let mongoCli = mongodb.MongoClient;
 
 export default class ScoreResolver {
@@ -14,40 +13,46 @@ export default class ScoreResolver {
     this.log = log;
 
     this.rateTbl = db.collection("ratings");
-    this.uniTbl = db.collection("university");
+    this.uniTbl = db.collection("universities");
     this.voidTbl = db.collection("void");
   }
 
-  getScore(university: string, names: string[]): Promise<returnedQuery[] | null> {
+  async getScore (university: string, names: string[]): Promise<returnedQuery[] | null> {
     names = names.map(v => v.toLowerCase());
 
-    return this.uniTbl.findOne({ name: university }).then(r => {
-      if (r == null)
-        return null;
-      return this.rateTbl.find({ university, name: { $in: names } }).toArray().then((docs: DatabasePerson[]) => {
-        if (docs.length == names.length) {
-          return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name }));
-        } else {
-          return this.voidTbl.find({ university, name: { $in: names } }).toArray().then(voidDocs => {
-            let totalDocs = voidDocs.concat(docs);
-            let remainingNames = names.filter(item => !totalDocs.some(found => found.name == item));
+    const uniDocument = await this.uniTbl.findOne({ name: university })
+    if (!uniDocument) return null;
 
-            if (remainingNames.length >= config.scrapeLimit) {
-              throw new Error("Trying to query way too many people");
-            }
+    const ratings: DatabasePerson[] = await this.rateTbl.find({ university, name: { $in: names } }).toArray()
+    const voidDocuments = await this.voidTbl.find({ university, name: { $in: names } }).toArray()
 
-            let formatedVoidDocs = voidDocs.map(v => { return { queryName: v.name, data: null } });
-            return Promise.all(remainingNames.map(v => this.rmpGet(v, new Scraper(university), university)))
-              .then((remain: any) => {
-                return docs.map(v => Object.assign({}, { data: v }, { queryName: v.name })).concat(remain).concat(formatedVoidDocs);
-              });
-          });
-        }
-      });
-    });
+    let remainingNames = names.filter(
+      name => (
+        !ratings.find(rat => rat.name === name) && 
+        !voidDocuments.find(v => v.name === name)
+      )
+    )
+
+    if (remainingNames.length >= Number(process.env.SCRAPE_LIMIT as string)) throw new Error('Trying to query too many people')
+
+    const scraped = await Promise.all(remainingNames.map(name => this.rmpGet(name, university)))
+    console.log(scraped)
+
+    const formattedRatings = ratings.map((v: DatabasePerson) => ({
+      queryName: v.name,
+      data: v
+    }))
+
+    const formattedVoidDocs = voidDocuments.map((v) => ({
+      queryName: v.name,
+      data: null
+    }))
+
+    return scraped.concat(formattedRatings).concat(formattedVoidDocs)
   }
-  rmpGet(name: string, scraper: Scraper, university: string): Promise<returnedQuery> {
-    return scraper.getDataByName(name).then(d => {
+  
+  rmpGet(name: string, university: string): Promise<returnedQuery> {
+    return new Scraper(university).getDataByName(name).then(d => {
       if (d == null) {
         this.voidTbl.insertOne({ university, name });
         return null;
@@ -70,10 +75,10 @@ export default class ScoreResolver {
 }
 
 interface DatabasePerson extends PersonObject {
-  name: string;
+  name: string
 }
 
 interface returnedQuery {
-  queryName: string;
-  data: PersonObject;
+  queryName: string
+  data: PersonObject | null
 }
