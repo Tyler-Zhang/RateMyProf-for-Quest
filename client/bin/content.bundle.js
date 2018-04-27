@@ -2565,8 +2565,6 @@
 
 	    var conflictChecker = parseCurrentClasses();
 
-	    console.log('Page found');
-
 	    mainTable.find("table[id^='SSR_CLSRCH_MTG']").attr("width", 700);
 	    var insHeading = mainTable.find("th[abbr='Instructor']"); // Find all heading called "instructor" so we can append more headings after them
 	    var headingTemplate = insHeading.first(); // Get a heading template
@@ -2928,7 +2926,6 @@
 	        renderPage(mainTable, teachers);
 	    } catch (e) {
 	        console.error(e);
-	        return true;
 	    }
 	    return true;
 	}
@@ -2945,8 +2942,7 @@
 	    /** Generates the headings for each class depending on the displayed_Headings array */
 
 	    var _displayed_Headings$r = displayed_Headings.reduce(function (a, b) {
-	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white; border-style:solid; border-width:1" }).html("--");
-
+	        var currScore = $("<td>").attr({ "rmpquest-type": b.key, style: "background-color:white; outline: 1px solid black;" }).html("--");
 	        var currHeading = headingTemplate.clone();
 	        currHeading.attr("width", 60);
 	        currHeading.html(b.name);

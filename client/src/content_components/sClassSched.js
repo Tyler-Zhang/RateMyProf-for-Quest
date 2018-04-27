@@ -47,7 +47,6 @@ export default function s_ClassSched(){
         renderPage(mainTable, teachers);
     } catch(e) {
         console.error(e);
-        return true;
     }
     return true;
 }
@@ -63,8 +62,7 @@ function renderPage(mainTable, teachers){
 
     /** Generates the headings for each class depending on the displayed_Headings array */
     let [headings, score] = displayed_Headings.reduce((a, b) => {
-        let currScore = $("<td>").attr({"rmpquest-type": b.key, style:"background-color:white; border-style:solid; border-width:1"}).html("--");
-
+        let currScore = $("<td>").attr({"rmpquest-type": b.key, style:"background-color:white; outline: 1px solid black;"}).html("--");
         let currHeading = headingTemplate.clone();
         currHeading.attr("width", 60);
         currHeading.html(b.name);

@@ -18,7 +18,7 @@ function base(api, body){
     .then(d => {
         return d.json();
     })
-    .catch( e => {
+    .catch(e => {
         return {success:false, body: e};
     })
     .then(d => {
