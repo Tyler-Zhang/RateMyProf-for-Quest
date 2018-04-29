@@ -28,9 +28,10 @@ mongoCli.connect(process.env.DB_URL as string, (err, d) => {
     log.error(err);
     throw err
   }
-  suggestTbl = d.collection("suggest");
-  Scorer = new ScoreResolver(log, d);
-  InitCron(d)
+  const db = d.db()
+  suggestTbl = db.collection("suggest");
+  Scorer = new ScoreResolver(log, db);
+  InitCron(log, db)
 });
 
 let app = express();

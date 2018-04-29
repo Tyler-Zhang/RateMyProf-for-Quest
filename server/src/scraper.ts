@@ -77,7 +77,6 @@ export class Scraper {
     let quality = returnNullOnError(() => (scoreWrapper.find("div.breakdown-container").find("div.grade").html() as string).trim())
 
     let breakdownSection = returnNullOnError(() => scoreWrapper.find(".breakdown-section"))
-    let retake = returnNullOnError(() => (breakdownSection.eq(0).children().html() as string).trim())
     let difficulty = returnNullOnError(() => (breakdownSection.eq(1).children().html() as string).trim())
     let chilli = returnNullOnError(() =>  breakdownSection.eq(2).find("img").attr("src"))
     let ratingCount = returnNullOnError(() => ($(".table-toggle.rating-count.active").html() as string).trim())
@@ -87,8 +86,8 @@ export class Scraper {
     let department = returnNullOnError(() => $(".result-title").clone().children().remove().end().text().trim())
 
     let fname = returnNullOnError(() => nameWrapper.eq(0).html().trim())
-    let mname = returnNullOnError(() => nameWrapper.eq(0).html().trim())
-    let lname = returnNullOnError(() => nameWrapper.eq(0).html().trim())
+    let mname = returnNullOnError(() => nameWrapper.eq(1).html().trim())
+    let lname = returnNullOnError(() => nameWrapper.eq(2).html().trim())
 
     let url = $("meta[property='og:url']").attr("content");
 
@@ -97,7 +96,6 @@ export class Scraper {
       mname,
       lname,
       quality: Number(quality),
-      retake,
       easiness: Number(difficulty),
       chilli,
       count: extractRatingAmount(ratingCount),
@@ -160,7 +158,6 @@ function extractDepartment(title: string): string | null {
  */
 export interface PersonObject {
   quality: number | null;
-  retake: string | null;
   easiness: number | null;
   chilli: string,
   count: number | null;
