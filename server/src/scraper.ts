@@ -64,25 +64,38 @@ export class Scraper {
       return null;
     }
 
+    const returnNullOnError = (func: () => any) => {
+      try {
+        let val = func()
+        return val
+      } catch (e) {
+        return null
+      }
+    }
+
     let scoreWrapper = $(".breakdown-wrapper");
-    let quality = (scoreWrapper.find("div.breakdown-container").find("div.grade").html() as string).trim();
+    let quality = returnNullOnError(() => (scoreWrapper.find("div.breakdown-container").find("div.grade").html() as string).trim())
 
-    let breakdownSection = scoreWrapper.find(".breakdown-section");
-    let retake = (breakdownSection.eq(0).children().html() as string).trim();
-    let difficulty = (breakdownSection.eq(1).children().html() as string).trim();
-    let chilli = breakdownSection.eq(2).find("img").attr("src");
-    let ratingCount = ($(".table-toggle.rating-count.active").html() as string).trim();
-    let nameWrapper = $(".profname").children();
-    let university = $(".school").html();
+    let breakdownSection = returnNullOnError(() => scoreWrapper.find(".breakdown-section"))
+    let retake = returnNullOnError(() => (breakdownSection.eq(0).children().html() as string).trim())
+    let difficulty = returnNullOnError(() => (breakdownSection.eq(1).children().html() as string).trim())
+    let chilli = returnNullOnError(() =>  breakdownSection.eq(2).find("img").attr("src"))
+    let ratingCount = returnNullOnError(() => ($(".table-toggle.rating-count.active").html() as string).trim())
+    let nameWrapper = returnNullOnError(() => $(".profname").children())
+    let university = returnNullOnError(() => $(".school").html())
 
-    let department = $(".result-title").clone().children().remove().end().text().trim();
+    let department = returnNullOnError(() => $(".result-title").clone().children().remove().end().text().trim())
+
+    let fname = returnNullOnError(() => nameWrapper.eq(0).html().trim())
+    let mname = returnNullOnError(() => nameWrapper.eq(0).html().trim())
+    let lname = returnNullOnError(() => nameWrapper.eq(0).html().trim())
 
     let url = $("meta[property='og:url']").attr("content");
 
     let rtnObj: PersonObject = {
-      fname: (nameWrapper.eq(0).html() as string).trim(),
-      mname: (nameWrapper.eq(1).html() as string).trim(),
-      lname: (nameWrapper.eq(2).html() as string).trim(),
+      fname,
+      mname,
+      lname,
       quality: Number(quality),
       retake,
       easiness: Number(difficulty),

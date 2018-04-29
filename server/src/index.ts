@@ -8,6 +8,7 @@ import * as bunyan from "bunyan";
 import * as mongodb from "mongodb";
 import * as fs from "fs";
 import ScoreResolver from "./scorer";
+import InitCron from './cron'
 
 const compression = require("compression");
 const log = bunyan.createLogger({
@@ -29,6 +30,7 @@ mongoCli.connect(process.env.DB_URL as string, (err, d) => {
   }
   suggestTbl = d.collection("suggest");
   Scorer = new ScoreResolver(log, d);
+  InitCron(d)
 });
 
 let app = express();

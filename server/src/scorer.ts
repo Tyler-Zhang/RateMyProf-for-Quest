@@ -36,8 +36,6 @@ export default class ScoreResolver {
     if (remainingNames.length >= Number(process.env.SCRAPE_LIMIT as string)) throw new Error('Trying to query too many people')
 
     const scraped = await Promise.all(remainingNames.map(name => this.rmpGet(name, university)))
-    console.log(scraped)
-
     const formattedRatings = ratings.map((v: DatabasePerson) => ({
       queryName: v.name,
       data: v
