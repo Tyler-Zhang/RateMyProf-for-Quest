@@ -26,12 +26,11 @@ export default class ScoreResolver {
     const ratings: DatabasePerson[] = await this.rateTbl.find({ university, name: { $in: names } }).toArray()
     const voidDocuments = await this.voidTbl.find({ university, name: { $in: names } }).toArray()
 
-    let remainingNames = names.filter(
-      name => (
-        !ratings.find(rat => rat.name === name) && 
-        !voidDocuments.find(v => v.name === name)
-      )
-    )
+    let resolvedNamesMap = {}
+    ratings.forEach(v => resolvedNamesMap[v.name] = true)
+    voidDocuments.forEach(v => resolvedNamesMap[v.name] = true)
+
+    let remainingNames = names.filter(name => !resolvedNamesMap[name])
 
     if (remainingNames.length >= Number(process.env.SCRAPE_LIMIT as string)) throw new Error('Trying to query too many people')
 
