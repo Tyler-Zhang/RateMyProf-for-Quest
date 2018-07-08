@@ -18,4 +18,4 @@ ENV PORT 80
 EXPOSE 80
 
 # Run the app when the container launches
-CMD ["yarn", "start"]
+CMD ["yarn", "deploy"]
