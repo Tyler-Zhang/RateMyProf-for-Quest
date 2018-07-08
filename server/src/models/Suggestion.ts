@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, UpdateDateColumn, Index, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, Index, CreateDateColumn, ManyToOne } from 'typeorm';
 import { University } from './University';
 
 @Entity()
@@ -9,14 +9,13 @@ export class Suggestion extends BaseEntity {
   @CreateDateColumn()
   created: Date;
 
-  @Column()
   @Index()
-  name: string | null;
+  @Column()
+  name: string;
 
   @Column()
   url: string;
 
-  @OneToOne(type => University)
-  @JoinColumn()
+  @ManyToOne(type => University)
   university: University;
 }

@@ -16,7 +16,7 @@
         "noImplicitThis": true,
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
-        "lib": ["es2015", "dom"]  
+        "lib": ["es2015", "es2017", "dom"]
       },
     "exclude": [
         "node_modules",

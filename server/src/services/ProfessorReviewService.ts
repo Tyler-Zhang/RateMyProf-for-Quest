@@ -19,9 +19,9 @@ export class ProfessorReviewService {
 
     professorNames = professorNames.map(name => name.toLowerCase());
 
-    const existingProfessors = await Professor.find({
-      where: { name: professorNames }
-    });
+    const existingProfessors = await Professor.createQueryBuilder('professor')
+      .where('professor.name IN (:...professorNames)', { professorNames })
+      .getMany();
 
     if (existingProfessors.length === professorNames.length) {
       // We found them all
