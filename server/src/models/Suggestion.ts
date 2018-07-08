@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Index, CreateDateColumn, ManyToOne } from 'typeorm';
 import { School } from './School';
+import { IsUrl } from 'class-validator';
 
 @Entity()
 export class Suggestion extends BaseEntity {
@@ -13,6 +14,7 @@ export class Suggestion extends BaseEntity {
   @Column()
   name: string;
 
+  @IsUrl()
   @Column()
   url: string;
 
