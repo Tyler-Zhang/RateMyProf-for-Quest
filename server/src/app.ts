@@ -1,20 +1,19 @@
 import { useExpressServer, useContainer } from 'routing-controllers';
+import { get } from 'lodash';
+import { join } from 'path';
 import * as compression from 'compression';
 import * as express from 'express';
-import { createConnection, getConnectionOptions } from 'typeorm';
+import { createConnection } from 'typeorm';
 import { Container } from 'typedi';
 import * as bodyParser from 'body-parser';
-import { log } from './config/logger';
+import { log, databaseConfig } from './config';
 
 export async function launch() {
-  const { DATABASE_URL, PORT } = process.env;
+  const port = get(process.env, 'PORT', 8080);
   /**
    * Connect to database
    */
-  await createConnection({
-    ...(await getConnectionOptions()),
-    url: DATABASE_URL
-  } as any);
+  await createConnection(databaseConfig);
 
   log.info(`Connected to database`);
 
@@ -25,14 +24,14 @@ export async function launch() {
   app.use(bodyParser.urlencoded({ extended: true }));
 
   useExpressServer(app, {
-    controllers: [__dirname + "/controllers/*.ts"],
+    controllers: [join(__dirname, 'controllers', '*.{ts,js}')],
     routePrefix: '/api',
     classTransformer: true,
     cors: true
   });
 
   app.use(compression);
-  app.listen(PORT);
+  app.listen(port);
 
-  log.info(`Running web app on port ${PORT}`);
+  log.info(`Running web app on port ${port}`);
 }
