@@ -1,8 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, UpdateDateColumn, Index, ManyToOne } from 'typeorm';
-import { University } from './University';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, UpdateDateColumn, Index, ManyToOne } from 'typeorm';
+import { Expose, Exclude } from 'class-transformer';
+import { School } from './School';
 
+@Exclude()
 @Entity()
-@Index(["name", "university"], { unique: true })
+@Index(["name", "school"], { unique: true })
 export class Professor extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,6 +20,7 @@ export class Professor extends BaseEntity {
   @UpdateDateColumn()
   updated: Date;
 
+  @Expose({ groups: ['client'] })
   @Column()
   @Index()
   name: string;
@@ -25,24 +28,25 @@ export class Professor extends BaseEntity {
   @Column({ type: 'integer', unique: true, nullable: true })
   resourceId: number | null;
 
+  @Expose({ groups: ['client'] })
   @Column({ type: 'decimal', precision: 2, scale: 1, nullable: true })
   quality: number | null;
 
-  @Column({ type: 'integer', nullable: true })
-  retake: number | null;
-
+  @Expose({ groups: ['client'] })
   @Column({ type: 'decimal', precision: 2, scale: 1, nullable: true })
   easiness: number | null;
 
+  @Expose({ groups: ['client'] })
   @Column({ type: 'integer', nullable: true })
   count: number | null;
 
+  @Expose({ groups: ['client'] })
   @Column({ type: 'text', nullable: true })
   url: string | null;
 
   @Column({ type: 'text', nullable: true })
   department: string | null;
 
-  @ManyToOne(type => University, { nullable: false })
-  university: University;
+  @ManyToOne(type => School, { nullable: false })
+  school: School;
 }

@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import Scraper, { PersonObject } from '../lib/Scraper';
-import { Professor, University } from '../models';
+import { Professor, School } from '../models';
 
 @Service()
 export class ScraperService {
@@ -10,8 +10,8 @@ export class ScraperService {
     this.scraper = new Scraper();
   }
 
-  public async getProfessorByName(university: University, name: string) {
-    const professor = await this.convertFromScraperPromise(this.scraper.getDataByName(university.name, name));
+  public async getProfessorByName(school: School, name: string) {
+    const professor = await this.convertFromScraperPromise(this.scraper.getDataByName(school.name, name));
 
     if (professor) {
       return professor;
@@ -49,7 +49,6 @@ export class ScraperService {
       professor.quality = result.quality;
       professor.name = result.name;
       professor.url = result.url;
-      professor.retake = result.retake;
 
       return professor;
     } catch (e) {

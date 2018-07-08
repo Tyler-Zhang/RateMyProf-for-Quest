@@ -1,7 +1,8 @@
-import { Controller, Body, Get, Post } from "routing-controllers";
+import { Controller, Body, Get, Post, UseAfter } from "routing-controllers";
 import { ProfessorReviewRequest } from "../requests";
 import { ProfessorReviewService } from "../services/ProfessorReviewService";
 import { Inject } from "typedi";
+import { classToPlain } from 'class-transformer';
 
 @Controller('/professors')
 export class ProfessorController {
@@ -10,8 +11,8 @@ export class ProfessorController {
   professorReviewService: ProfessorReviewService;
 
   @Post('/reviews')
-  getProfessorReviews(@Body({ validate: true }) body: any) {
-    console.log(body);
-    return this.professorReviewService.getReviews(body.university, body.names);
+  async getProfessorReviews(@Body({ validate: true }) body: ProfessorReviewRequest) {
+    const professors = await this.professorReviewService.getReviews(body.school, body.names);
+    return classToPlain(professors, { groups: ['client'] });
   }
 }

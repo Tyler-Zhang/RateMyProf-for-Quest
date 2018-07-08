@@ -1,6 +1,6 @@
 import { Service, Inject } from 'typedi';
 import { NotFoundError } from '../errors';
-import { University, Professor } from '../models';
+import { School, Professor } from '../models';
 import { ScraperService } from './ScraperService';
 
 @Service()
@@ -8,13 +8,13 @@ export class ProfessorReviewService {
   @Inject()
   scraperService: ScraperService
 
-  async getReviews (universityName: string, professorNames: string[]) {
-    const university = await University.findOne({
-      where: { name: universityName }
+  async getReviews (schoolName: string, professorNames: string[]) {
+    const school = await School.findOne({
+      where: { name: schoolName }
     });
 
-    if (!university) {
-      throw new NotFoundError(`The university ${universityName} is not supported`);
+    if (!school) {
+      throw new NotFoundError(`The school ${schoolName} is not supported`);
     }
 
     professorNames = professorNames.map(name => name.toLowerCase());
@@ -35,9 +35,9 @@ export class ProfessorReviewService {
 
     // Resolve the missing profs
     const resolvedProfs = await Promise.all(unresolvedNames.map(async name => {
-      const scraped = await this.scraperService.getProfessorByName(university, name)
+      const scraped = await this.scraperService.getProfessorByName(school, name)
       scraped.name = name; // Override the name to what we were searching for
-      scraped.university = university;
+      scraped.school = school;
       return scraped;
     }));
 

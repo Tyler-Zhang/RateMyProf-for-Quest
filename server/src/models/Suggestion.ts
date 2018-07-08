@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, Index, CreateDateColumn, ManyToOne } from 'typeorm';
-import { University } from './University';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Index, CreateDateColumn, ManyToOne } from 'typeorm';
+import { School } from './School';
 
 @Entity()
 export class Suggestion extends BaseEntity {
@@ -16,6 +16,6 @@ export class Suggestion extends BaseEntity {
   @Column()
   url: string;
 
-  @ManyToOne(type => University)
-  university: University;
+  @ManyToOne(type => School)
+  school: School;
 }

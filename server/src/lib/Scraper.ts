@@ -12,13 +12,12 @@ const SEARCH_URL = `${BASE_URL}/search.jsp?queryBy=teacherName`;
  */
 export interface PersonObject {
   quality: number | null;
-  retake: number | null;
   easiness: number | null;
   count: number | null;
   name: string;
   id: number | null;
   url: string | null;
-  university: string | null;
+  school: string | null;
   department: string | null;
 }
 
@@ -26,8 +25,8 @@ export default class Scraper {
   /**
    * Scrapes data by the name of the professor
    */
-  public async getDataByName(university: string, name: string): Promise<PersonObject | null> {
-    const url = `${SEARCH_URL}&schoolName=${encodeURIComponent(university)}&query=${encodeURIComponent(name)}`;
+  public async getDataByName(school: string, name: string): Promise<PersonObject | null> {
+    const url = `${SEARCH_URL}&schoolName=${encodeURIComponent(school)}&query=${encodeURIComponent(name)}`;
     const request = await axios.get(url);
 
     /**
@@ -36,12 +35,11 @@ export default class Scraper {
      */
      const $ = cheerio.load(request.data);
      const professorUrl = $("li.listing.PROFESSOR").find("a").attr("href");
-
      if (!professorUrl) {
        return null;
      }
 
-     return this.getDataByUrl(professorUrl);
+     return this.getDataByUrl(`${BASE_URL}/${professorUrl}`);
   }
 
   /**
@@ -71,13 +69,12 @@ export default class Scraper {
 
     let scoreWrapper = $(".breakdown-wrapper");
     let breakdownSection = scoreWrapper.find(".breakdown-section");
-    let quality = (scoreWrapper.find("div.breakdown-container").find("div.grade").html() as string).trim();
 
-    let retake = attempt(null, () => Number(breakdownSection.eq(0).children().html()));
+    let quality = Number(scoreWrapper.find("div.breakdown-container").find("div.grade").html() as string);
     let difficulty = attempt(null, () => Number(breakdownSection.eq(1).children().html()));
     let ratingCount = attempt(null, () => _.parseInt($(".table-toggle.rating-count.active").html() as string));
     let name = removeExtraWhitespace($(".profname").text());
-    let university = attempt(null, () => $(".school").html());
+    let school = attempt(null, () => $(".school").html());
 
     let department = $(".result-title").clone().children().remove().end().text().trim();
 
@@ -85,13 +82,12 @@ export default class Scraper {
 
     let personObject: PersonObject = {
       name,
-      quality: Number(quality),
-      retake,
-      easiness: Number(difficulty),
+      quality,
+      easiness: difficulty,
       count: ratingCount,
       url,
       id: extractIdFromUrl(url),
-      university,
+      school,
       department: extractDepartment(department)
     }
 

@@ -1,3 +1,3 @@
 export * from './Professor';
-export * from './University';
+export * from './School';
 export * from './Suggestion';

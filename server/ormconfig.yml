@@ -1,7 +1,7 @@
 default:
   type: postgres
   synchronize: true
-  logging: true
+  logging: false
   entities:
     - src/models/**/*.ts
   migrations:
