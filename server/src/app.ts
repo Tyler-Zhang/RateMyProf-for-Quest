@@ -4,7 +4,6 @@ import * as express from 'express';
 import { createConnection, getConnectionOptions } from 'typeorm';
 import { Container } from 'typedi';
 import * as bodyParser from 'body-parser';
-import * as multer from 'multer';
 import { log } from './config/logger';
 
 export async function launch() {
@@ -29,10 +28,7 @@ export async function launch() {
     controllers: [__dirname + "/controllers/*.ts"],
     routePrefix: '/api',
     classTransformer: true,
-    cors: true,
-    middlewares: [
-      bodyParser.json(),
-    ]
+    cors: true
   });
 
   app.use(compression);
