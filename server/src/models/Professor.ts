@@ -17,6 +17,10 @@ export class Professor extends BaseEntity {
   @UpdateDateColumn()
   updated: Date;
 
+  @Column()
+  @Index()
+  name: string;
+
   @Column({ unique: true })
   resourceId: number | null;
 
@@ -31,10 +35,6 @@ export class Professor extends BaseEntity {
 
   @Column()
   count: number | null;
-
-  @Column()
-  @Index()
-  name: string | null;
 
   @Column()
   url: string | null;
