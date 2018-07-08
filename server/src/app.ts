@@ -7,9 +7,11 @@ import { createConnection } from 'typeorm';
 import { Container } from 'typedi';
 import * as bodyParser from 'body-parser';
 import { log, databaseConfig } from './config';
+import { startJobs } from './jobs';
+
 
 export async function launch() {
-  const port = get(process.env, 'PORT', 8080);
+  const port = get(process.env, 'PORT', 80);
   /**
    * Connect to database
    */
@@ -34,4 +36,6 @@ export async function launch() {
   app.listen(port);
 
   log.info(`Running web app on port ${port}`);
+
+  startJobs();
 }
