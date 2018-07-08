@@ -1,0 +1,20 @@
+{
+  "name": "waterloo-quest-plus-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "pg": "^7.4.3",
+    "reflect-metadata": "^0.1.12",
+    "typeorm": "^0.2.7"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.8"
+  }
+}

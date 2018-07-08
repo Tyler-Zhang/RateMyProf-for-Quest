@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, UpdateDateColumn, Index } from 'typeorm';
 import { University } from './University';
 
 @Entity()
@@ -33,6 +33,7 @@ export class Professor extends BaseEntity {
   count: number | null;
 
   @Column()
+  @Index()
   name: string | null;
 
   @Column()
