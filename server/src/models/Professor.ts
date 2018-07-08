@@ -14,6 +14,7 @@ export class Professor extends BaseEntity {
    * them. By storing it in the database, we ensure that we don't keep trying
    * to scrape for the same professor.
    */
+  @Expose({ groups: ['client'] })
   @Column()
   isMissing: boolean;
 
