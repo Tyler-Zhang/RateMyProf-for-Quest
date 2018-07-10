@@ -2,7 +2,7 @@
     "compilerOptions": {
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "outfile": "./dist/content.bundle.js",
+        "outFile": "./dist/content.bundle.js",
         "target": "es2017",
         "module": "commonjs",
         "moduleResolution": "node",
