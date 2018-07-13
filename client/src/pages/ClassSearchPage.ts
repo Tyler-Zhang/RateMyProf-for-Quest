@@ -1,7 +1,8 @@
 import { uniq, lowerCase } from 'lodash';
+import * as $ from 'jquery';
 import { AbstractProfessorRatingPage } from './AbstractProfessorRatingPage';
 import { Professor } from '../models';
-import { calculateColor } from '../utils';
+import { calculateGrade } from '../utils';
 
 export class ClassSearchPage extends AbstractProfessorRatingPage {
   private teacherRows: JQuery<HTMLElement>;
@@ -20,55 +21,57 @@ export class ClassSearchPage extends AbstractProfessorRatingPage {
 
   protected insertProfMetricNodes() {
     const that = this;
+    const instructorNodes = this.getInstructorNodes();
 
-    this.getInstructorNodes().each(function() {
+    instructorNodes.each(function() {
       const teacherName = lowerCase($(this).text());
-      const metricNodes = that.createProfMetricNodes({ 'wqp-name': teacherName });
+      const metricNodes = that.createProfMetricNodes(instructorNodes.first(), { 'wqp-name': teacherName });
       $(this).after(metricNodes);
 
-      // Also tag the name
-      $(this).prop({
+      // Have to wrap children because the parent element
+      // Keeps getting reset
+      $(this).children().attr({
         'wqp-type': 'name',
         'wqp-name': teacherName
-      })
+      });
     })
   }
 
   protected getProfessorsOnPage() {
     const allNames = this.teacherRows.find('span[id^="MTG_INSTR"]')
-      .map((index, dom) => dom.innerHTML)
-      .map(lowerCase as any) as any;
+      .toArray()
+      .map((dom) => lowerCase(dom.innerHTML))
 
     return uniq(allNames) as string[];
   }
 
   protected populateProfMetricNodes(professors: Professor[]) {
-    const metrics = this.metrics;
-
     for(const professor of professors) {
       if (professor.name === 'staff') {
-        return;
+        continue;
       }
 
       if (professor.isMissing) {
         // Add a link for them to suggest a rate my prof link
-        $(`td[wqp-type="name"][wqp-name="${professor.name}"`)
-          .children()
+        this._$.find(`div[wqp-type="name"][wqp-name="${professor.name}"]`)
           .wrap(this.createSuggestLink(professor.name));
 
         continue;
       }
 
-      for(const metric of metrics) {
+      for(const metric of this.metrics) {
         const val = professor[metric.key];
-
-        $(`td[wqp-type="${metric.key}"][wqp-name="${professor.name}"]`)
+        this._$.find(`td[wqp-type="${metric.key}"][wqp-name="${professor.name}"]`)
           .html(val)
-          .css({
-            'background-color': metric.colored ? calculateColor(val, 5, { inverted: metric.colored_inverted }) : 'white'
-          });
+          .addClass(metric.colored ? calculateGrade(val, 5, { inverted: metric.colored_inverted }) : '');
+
+        this._$.find(`div[wqp-type="name"][wqp-name="${professor.name}"]`).wrap(this.createViewLink(professor.url));
       }
     }
+  }
+
+  protected addClassToTableRows(className: string) {
+    this.teacherRows.addClass(className)
   }
 
   private getInstructorHeadings() {

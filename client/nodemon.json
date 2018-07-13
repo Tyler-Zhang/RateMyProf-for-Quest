@@ -1,0 +1,6 @@
+{
+  "ignore": ["src/**/*.specs.ts"],
+  "watch": ["src"],
+  "ext": "ts,scss",
+  "exec": "sh ./build-prod.sh"
+}

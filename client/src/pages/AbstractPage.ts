@@ -7,10 +7,10 @@ export abstract class AbstractPage {
     this._$ = this.getMainContainer();
   }
 
-  public run = async (next: () => any, done: () => any) => {
+  public run = async (next: () => any, done: (success: boolean) => any) => {
     if (this.isPageCorrect()) {
       await this.modifyPage();
-      done();
+      done(true);
       return;
     }
 

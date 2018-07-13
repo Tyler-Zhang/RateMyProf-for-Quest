@@ -14,8 +14,12 @@ export abstract class AbstractProfessorRatingPage extends AbstractPage {
   }
 
   protected async modifyPage() {
+    /**
+     * Do before querying
+     */
     this.insertTableHeadings();
     this.insertProfMetricNodes();
+    this.addClassToTableRows('wqp-prof-row');
 
     const professors = this.getProfessorsOnPage();
     const ratings = await getReviews(professors);
@@ -44,16 +48,21 @@ export abstract class AbstractProfessorRatingPage extends AbstractPage {
   protected abstract populateProfMetricNodes(professors: Professor[]): void;
 
   /**
+   * Tag professor rows with 'wqp-professor-row' so that we can easily reference them
+   */
+  protected abstract addClassToTableRows(className: string): void;
+  /**
    * Creates the actual table data nodes that will eventually be populated
    * with the scores for the professor
    */
-  protected createProfMetricNodes(additionalProps: Record<string, string> = {}) {
+  protected createProfMetricNodes(template: JQuery<HTMLElement>, additionalProps: Record<string, string> = {}) {
     return $.map(this.metrics, (heading) => (
-      $('<td>').attr({
-        style: 'background-color:white; border-style:solid; border-width:1',
-        'wqp-metric': heading.key,
+      template.clone().attr({
+        'wqp-type': heading.key,
         ...additionalProps
-      }).html('--')
+      })
+      .html('--')
+      .addClass('wqp-rating')
     ));
   }
 
@@ -63,8 +72,8 @@ export abstract class AbstractProfessorRatingPage extends AbstractPage {
   protected createHeadingNodes(template: JQuery<HTMLElement>) {
     return this.metrics.map((heading) => (
       template.clone()
-        .attr('width', 60)
         .html(heading.name)
+        .addClass('wqp-heading')
     ));
   }
 
@@ -76,11 +85,20 @@ export abstract class AbstractProfessorRatingPage extends AbstractPage {
       title: `Suggest a link for ${name}`,
       href: 'javascript:void(0)'
     })
-    .click(() => this.onSuggestLinkClick(name));
+    .click(() => this.onSuggestLinkClick(name))
+    .addClass('wqp-suggest-link');
   }
 
-  protected onSuggestLinkClick (name: string) {
-    chrome.runtime.sendMessage({ name, message: 'openSuggest' })
+  protected onSuggestLinkClick(name: string) {
+    chrome.runtime.sendMessage({ name, message: 'openSuggestionPage' })
+  }
+
+  /**
+   * Creates a view on Rate My Professor link
+   */
+  protected createViewLink(url: string) {
+    return $('<a>')
+      .prop({ href: url, 'alt-text': 'View on Rate My Professor', target: '_blank' })
   }
 
   protected get metrics (): ProfessorMetric[] {

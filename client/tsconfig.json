@@ -2,9 +2,9 @@
     "compilerOptions": {
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "outFile": "./dist/content.bundle.js",
+        "outDir": "./dist",
         "target": "es2017",
-        "module": "commonjs",
+        "module": "amd",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "removeComments": true,

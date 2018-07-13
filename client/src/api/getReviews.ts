@@ -1,5 +1,5 @@
+import * as $ from 'jquery';
 import { apiConfig } from '../config';
-import { stringify } from 'querystring';
 import { Professor } from '../models';
 
 export async function getReviews (names: string[]) {
@@ -8,12 +8,12 @@ export async function getReviews (names: string[]) {
     names
   };
 
-  const encodedBody = stringify(body);
+  const encodedBody = $.param(body);
 
   const request = await fetch(apiConfig.professorReviewUrl, {
     body: encodedBody,
     headers: {
-      'Content-type': 'x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
     method: 'POST'
   });

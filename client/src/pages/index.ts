@@ -4,4 +4,5 @@ import { ClassSearchPage } from './ClassSearchPage';
 
 export const PagePipeline = new Pipeline([
   new ClassSearchPage().run
-]);
+],
+false);
