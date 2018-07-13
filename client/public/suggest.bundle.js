@@ -1,48 +1,46 @@
-/******/ (function(modules) { // webpackBootstrap
+/******/ (function (modules) { // webpackBootstrap
 /******/ 	// The module cache
-/******/ 	var installedModules = {};
+  /******/ 	var installedModules = {}
 
 /******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-
+/******/ 	function __webpack_require__ (moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
+  /******/ 		if (installedModules[moduleId])
+  /******/ 			{return installedModules[moduleId].exports;}
 
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
+  /******/ 		var module = installedModules[moduleId] = {
+  /******/ 			exports: {},
+  /******/ 			id: moduleId,
+  /******/ 			loaded: false
+/******/ 		}
 
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__)
 
 /******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
+/******/ 		module.loaded = true
 
 /******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ 		return module.exports
 /******/ 	}
 
-
 /******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
+  /******/ 	__webpack_require__.m = modules
 
 /******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
+/******/ 	__webpack_require__.c = installedModules
 
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = '';
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
+  /******/ 	return __webpack_require__(0)
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
@@ -86,9 +84,9 @@
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
-/***/ }),
+/***/ },
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
@@ -137,14 +135,14 @@
 	 * @param {String} name the name of the professors
 	 * @param {String} url the url of the rate my prof page
 	 */
-	function suggestReview(name, university, link) {
-	    return base("/suggest", { name: name, university: university, link: link });
+	function suggestReview(name, school, url) {
+	    return base("/suggest", { name: name, school: school, url: url });
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
-/***/ }),
+/***/ },
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {"use strict";
 
@@ -2430,9 +2428,9 @@
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
-/***/ }),
+/***/ },
 /* 3 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -2446,13 +2444,13 @@
 	}
 
 
-/***/ }),
+/***/ },
 /* 4 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
-/***/ })
-/******/ ]);
+/***/ }
+/******/ ])

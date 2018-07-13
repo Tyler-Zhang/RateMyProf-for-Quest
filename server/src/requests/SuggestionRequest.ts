@@ -1,6 +1,6 @@
-import { IsString, IsArray, IsUrl} from 'class-validator';
+import { IsString, IsUrl} from 'class-validator';
 
-export class ProfessorReviewRequest {
+export class SuggestionRequest {
   @IsString()
   school: string;
 
