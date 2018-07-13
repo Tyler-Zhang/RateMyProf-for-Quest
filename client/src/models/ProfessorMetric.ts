@@ -4,6 +4,6 @@ export interface ProfessorMetric {
   key: string;
   colored: boolean;
   decimal: boolean;
-  colored_inverted?: boolean;
+  colorInverted?: boolean;
   offset?: number;
 }

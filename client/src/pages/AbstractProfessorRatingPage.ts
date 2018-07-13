@@ -108,8 +108,7 @@ export abstract class AbstractProfessorRatingPage extends AbstractPage {
         desc: 'How generally awesome the professor is',
         key: 'quality',
         colored: true,
-        colored_inverted: false,
-        offset: 0,
+        colorInverted: false,
         decimal: true
       },
       {
@@ -117,8 +116,8 @@ export abstract class AbstractProfessorRatingPage extends AbstractPage {
         desc: 'How easy the professor is ',
         key: 'easiness',
         colored: true,
-        colored_inverted: true,
-        offset: 1.5,
+        colorInverted: true,
+        offset: 1.3,
         decimal: true
       },
       {

@@ -1,10 +1,13 @@
 export interface CalculateGradeOptions {
-  inverted?: boolean
+  inverted?: boolean;
+  offset?: number;
 }
 
 export function calculateGrade (val: number, max: number, {
-  inverted = false
+  inverted = false,
+  offset = 0
 }: CalculateGradeOptions = {}) {
+  val += offset;
 
   if (inverted) {
     val = max - val;
