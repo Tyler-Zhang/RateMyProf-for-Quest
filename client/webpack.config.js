@@ -9,7 +9,7 @@ module.exports = {
     minimize: !DEV
   },
   entry: {
-    content: './src/index.ts',
+    content: './src/content.index.ts',
     suggest: './src/suggest.index.ts'
   },
   output: {
