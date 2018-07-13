@@ -9,7 +9,7 @@ ___
 
 <br></br>
 
-### Shows difficulty, easiness, and number of reviews right in the page! 
+### Shows difficulty, easiness, and number of reviews right in the page!
 ![](http://i.imgur.com/eJCnlnB.png)
 
 <br></br>
@@ -26,9 +26,8 @@ ___
 
 
 
-## Tech used
-* Webpack
-* Jquery
-* Nodejs (obviously)
-* Cheerio (For web scraping)
-* Mongodb
+## Built using
+
+* Docker
+* Node.js
+* Typescript (great libs like Typeorm, Routing-Controllers)
