@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, UpdateDateColumn, Index, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, UpdateDateColumn, Index, ManyToOne, In } from 'typeorm';
 import { Expose, Exclude } from 'class-transformer';
 import { School } from './School';
 
@@ -26,7 +26,8 @@ export class Professor extends BaseEntity {
   @Index()
   name: string;
 
-  @Column({ type: 'integer', unique: true, nullable: true })
+  @Column({ type: 'integer', nullable: true })
+  @Index()
   resourceId: number | null;
 
   @Expose({ groups: ['client'] })

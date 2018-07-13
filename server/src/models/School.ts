@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, Index } from 'typeorm';
 import { Professor } from './Professor';
 import { Suggestion } from './Suggestion';
 
@@ -7,7 +7,8 @@ export class School extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
+  @Index()
   name: string;
 
   @OneToMany(type => Professor, professor => professor.school)

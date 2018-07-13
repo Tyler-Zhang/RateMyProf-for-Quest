@@ -22,8 +22,9 @@ export async function launch() {
   useContainer(Container);
 
   const app = express();
-  app.use(bodyParser.json());
+  app.use(compression());
   app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
 
   useExpressServer(app, {
     controllers: [join(__dirname, 'controllers', '*.{ts,js}')],
@@ -32,7 +33,6 @@ export async function launch() {
     cors: true
   });
 
-  app.use(compression);
   app.listen(port);
 
   log.info(`Running web app on port ${port}`);
