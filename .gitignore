@@ -40,4 +40,5 @@ config.js
 
 built.zip
 .env
-server/build
+.vscode
+client.bak

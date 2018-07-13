@@ -1,0 +1,22 @@
+version: "3"
+services:
+  web:
+    image: tylerzhang/waterlooquestplus:0.1
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    environment:
+      DATABASE_URL: "postgres://postgres@postgres_1:5432/waterlooquestplus"
+      DATABASE_SYNC: 1
+    ports:
+      - "4000:80"
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+    external: true
