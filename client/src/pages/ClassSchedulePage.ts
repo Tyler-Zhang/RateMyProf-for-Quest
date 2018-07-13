@@ -4,15 +4,15 @@ import { AbstractProfessorRatingPage } from './AbstractProfessorRatingPage';
 import { Professor } from '../models';
 import { calculateGrade } from '../utils';
 
-export class ClassSearchPage extends AbstractProfessorRatingPage {
+export class ClassSchedulePage extends AbstractProfessorRatingPage {
   private teacherRows: JQuery<HTMLElement>;
 
   protected pageInfoPageAttribute() {
-    return 'SSR_CLSRCH_RSLT';
+    return 'SSR_SSENRL_LIST';
   }
 
   protected setup() {
-    this.teacherRows = this._$.find('tr[id^="trSSR_CLSRCH_MTG1"]');
+    this.teacherRows = this._$.find('tr[id^="trCLASS_MTG_VW"]');
   }
 
   protected insertTableHeadings() {
@@ -37,11 +37,11 @@ export class ClassSearchPage extends AbstractProfessorRatingPage {
         'wqp-type': 'name',
         'wqp-name': teacherName
       });
-    })
+    });
   }
 
   protected getProfessorsOnPage() {
-    const allNames = this.teacherRows.find('span[id^="MTG_INSTR"]')
+    const allNames = this.teacherRows.find('span[id^="DERIVED_CLS_DTL_SSR_INSTR_LONG"]')
       .toArray()
       .map((dom) => lowerCase(dom.innerHTML))
 
@@ -82,6 +82,6 @@ export class ClassSearchPage extends AbstractProfessorRatingPage {
   }
 
   private getInstructorNodes() {
-    return this._$.find('div[id^="win0divMTG_INSTR"]').parent();
+    return this._$.find('div[id^="win0divDERIVED_CLS_DTL_SSR_INSTR_LONG"]').parent();
   }
 }

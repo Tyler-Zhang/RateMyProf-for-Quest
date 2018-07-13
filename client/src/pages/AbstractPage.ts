@@ -9,12 +9,21 @@ export abstract class AbstractPage {
 
   public run = async (next: () => any, done: (success: boolean) => any) => {
     if (this.isPageCorrect()) {
+      await this.setup();
       await this.modifyPage();
       done(true);
       return;
     }
 
     next();
+  }
+
+  /**
+   * Gets run before the modify page, allowing the class to set
+   * up variables
+   */
+  protected setup() {
+    return;
   }
 
   /**
@@ -28,7 +37,19 @@ export abstract class AbstractPage {
   /**
    * Should check to see if we are on the correct page
    */
-  protected abstract isPageCorrect(): boolean;
+  protected isPageCorrect() {
+    return this._$.find(`div#pt_pageinfo_win0[page="${this.pageInfoPageAttribute()}"]`).length > 0;
+  };
+
+  /**
+   * Gets the page attribute that is used to represent the page on quest. It's an element
+   * that looks like:
+   *
+   * <div id="pt_pageinfo_win0" page="SSR_CLSRCH_RSLT" component="CLASS_SEARCH" menu="SA_LEARNER_SERVICES" mode="CLASSIC"></div>
+   */
+  protected pageInfoPageAttribute() {
+    return '';
+  }
 
   /**
    *  Actually modify the page
