@@ -13,7 +13,7 @@ module.exports = {
     suggest: './src/suggest.index.ts'
   },
   output: {
-    filename: '[name].bundle.js'
+    filename: './dist/[name].bundle.js'
   },
   resolve: {
     // Add `.ts` and `.tsx` as a resolvable extension.

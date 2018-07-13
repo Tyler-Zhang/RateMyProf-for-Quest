@@ -66,7 +66,7 @@ export class ClassSchedulePage extends AbstractProfessorRatingPage {
         const val = professor[metric.key];
         this._$.find(`td[wqp-type="${metric.key}"][wqp-name="${professor.name}"]`)
           .html(val)
-          .addClass(metric.colored ? calculateGrade(val, 5, { inverted: metric.colored_inverted }) : '');
+          .addClass(metric.colored ? calculateGrade(val, 5, { inverted: metric.colorInverted }) : '');
 
         this._$.find(`div[wqp-type="name"][wqp-name="${professor.name}"]`).wrap(this.createViewLink(professor.url));
       }
