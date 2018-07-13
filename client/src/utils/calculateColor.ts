@@ -10,7 +10,7 @@ export function calculateGrade (val: number, max: number, {
     val = max - val;
   }
 
-  if (val <= 1.5) {
+  if (val <= 1.2) {
     return 'wqp-rating-0';
   } else if (val <= 2) {
     return 'wqp-rating-1';
