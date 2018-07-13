@@ -18,5 +18,7 @@ export class SuggestionController {
     suggestion.school = school;
 
     suggestion.save();
+
+    return suggestion;
   }
 }

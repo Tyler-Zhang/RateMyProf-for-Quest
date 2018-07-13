@@ -8,9 +8,12 @@ module.exports = {
   optimization: {
     minimize: !DEV
   },
-  entry: './src/index.ts',
+  entry: {
+    content: './src/index.ts',
+    suggest: './src/suggest.index.ts'
+  },
   output: {
-    filename: 'content.bundle.js'
+    filename: '[name].bundle.js'
   },
   resolve: {
     // Add `.ts` and `.tsx` as a resolvable extension.
