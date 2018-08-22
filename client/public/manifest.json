@@ -4,7 +4,7 @@
   "name": "Waterloo Quest+",
   "short_name": "WQ+",
   "description": "Helpful improvements for Waterloo's Quest System",
-  "version": "2.11",
+  "version": "2.12",
   "content_scripts": [
       {
           "matches": ["*://quest.pecs.uwaterloo.ca/*"],
