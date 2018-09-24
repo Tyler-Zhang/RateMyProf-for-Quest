@@ -42,3 +42,5 @@ built.zip
 .env
 .vscode
 client.bak
+
+volumes
