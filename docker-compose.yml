@@ -1,11 +1,10 @@
 version: "3"
 services:
-  db:
-    image: postgres
-    container_name: postgres_1
+  postgres:
+    image: postgres:10.5
     networks:
-      - wqp-network
-    hostname: postgres_1
+      - network
+    hostname: postgres
     volumes:
       - ./volumes/db:/var/lib/postgresql/data
     environment:
@@ -14,14 +13,15 @@ services:
   api:
     image: tylerzhang/waterlooquestplus:0.2
     environment:
-      DATABASE_URL: "postgres://postgres@postgres_1/waterlooquestplus"
+      DATABASE_URL: "postgresql://postgres@postgres/waterlooquestplus"
       DATABASE_SYNC: 1
     ports:
       - "3000:80"
     networks:
-      - wqp-network
+      - network
     depends_on:
-      - db 
+      - postgres
+    hostname: api
 networks:
-  wqp-network:
+  network:
     driver: bridge
